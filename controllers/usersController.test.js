@@ -5,3 +5,7 @@
 test('returns true', () => {
   expect(true).toBe(true);
 });
+
+test('this second test is just for checking if something works', () => {
+  expect('Stringy thing').toBeTruthy();
+});

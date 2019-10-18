@@ -27,23 +27,22 @@ const signUp = async(req, res) => {
     }
 };
 
-// TO DO: implement signIn functionality with jwt
-const signIn = (req, res) => {
+const signIn = async(req, res) => {
     var body = req.body;
 
-    User.findOne({ email: body.email }, (err, userDB) => {
+    await User.findOne({ email: body.email }, (err, userDB) => {
         if (err) {
-            return res.status(500).json({
+            return res.status(404).json({
                 ok: false,
-                msg: `user search failed`,
+                msg: 'user search failed',
                 errors: err
             });
         }
 
         if (!userDB) {
-            return res.status(400).json({
+            return res.status(401).json({
                 ok: false,
-                msg: 'Credenciales incorrectas - email',
+                msg: `The ${body.email} isn´t correct`,
                 errors: err
             });
         }
@@ -54,7 +53,7 @@ const signIn = (req, res) => {
         if (!bcrypt.compareSync(body.password, userDB.password)) {
             return res.status(400).json({
                 ok: false,
-                msg: 'Credenciales incorrectas - password',
+                msg: 'The password isn´t correct',
                 errors: err
             });
         }
@@ -62,17 +61,15 @@ const signIn = (req, res) => {
         // Crear un token 
         // ======================================================
 
-
-        userDB.password = ':D' // setea carita para ocultar clave jiji
-
-        // To-Do : Seed como variable de entorno ??
         var token = jwt.sign({ user: userDB }, process.env.SEED_JWT, { expiresIn: 14400 });
-
+        userDB.password = '';
         res.status(200).json({
             ok: true,
-            user: userDB,
-            token: token,
-            id: userDB.id
+            id: userDB.id,
+            nombre: userDB.name,
+            email: userDB.email,
+            token: token
+
         });
 
     });
@@ -83,22 +80,22 @@ const getUsers = (req, res) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                msg: 'error cargando usuarios',
+                msg: 'Could not load user',
                 errors: err
             });
         }
-        User.count({}, (err, _count) => {
+        User.count({}, (err, size) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    msg: 'Error al intentar contar usuarios ???????????????',
+                    msg: 'Error trying to count users',
                     errors: err
                 })
             }
 
             return res.status(200).json({
                 ok: true,
-                total: _count,
+                total: size,
                 users: users
             });
         })
@@ -109,4 +106,5 @@ module.exports = {
     signUp,
     signIn,
     getUsers
+
 };

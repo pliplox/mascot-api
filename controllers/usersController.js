@@ -60,8 +60,7 @@ const signIn = async(req, res) => {
         // ======================================================
         // Crear un token 
         // ======================================================
-
-        var token = jwt.sign({ user: userDB }, process.env.SEED_JWT, { expiresIn: 14400 });
+        var token = jwt.sign({ user: userDB }, process.env.TOKEN_SECRET, { expiresIn: 14400 });
         userDB.password = '';
         res.status(200).json({
             ok: true,

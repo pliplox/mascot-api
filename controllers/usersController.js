@@ -1,79 +1,9 @@
-const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const { registerValidation } = require('../validation');
+const bcrypt = require('bcryptjs');
 
-const signUp = async(req, res) => {
-    const { error } = registerValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    const emailExist = await User.findOne({ email: req.body.email });
-    if (emailExist) return res.status(400).send('Email already exists');
-
-    // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-    const user = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword
-    });
-
-    try {
-        const savedUser = await user.save();
-        return res.send({ userId: savedUser._id });
-    } catch (err) {
-        return res.status(400).send(err);
-    }
-};
-
-const signIn = async(req, res) => {
-    var body = req.body;
-
-    await User.findOne({ email: body.email }, (err, userDB) => {
-        if (err) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'user search failed',
-                errors: err
-            });
-        }
-
-        if (!userDB) {
-            return res.status(401).json({
-                ok: false,
-                msg: `The ${body.email} isn´t correct`,
-                errors: err
-            });
-        }
-
-        // ======================================================
-        // verificar contraseña
-        // ======================================================
-        if (!bcrypt.compareSync(body.password, userDB.password)) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'The password isn´t correct',
-                errors: err
-            });
-        }
-        // ======================================================
-        // Crear un token 
-        // ======================================================
-        var token = jwt.sign({ user: userDB }, process.env.TOKEN_SECRET, { expiresIn: 14400 });
-        userDB.password = '';
-        res.status(200).json({
-            ok: true,
-            id: userDB.id,
-            nombre: userDB.name,
-            email: userDB.email,
-            token: token
-
-        });
-
-    });
-};
-
+// ======================================================
+// Get all users
+// ======================================================
 const getUsers = (req, res) => {
     User.find({}, 'name email createdAt lastLogin', (err, users) => {
         if (err) {
@@ -101,9 +31,94 @@ const getUsers = (req, res) => {
     });
 }
 
-module.exports = {
-    signUp,
-    signIn,
-    getUsers
+// ======================================================
+// Update user
+// ======================================================
+const updateUser = (req, res) => {
+    const id = req.params.id;
+    const body = req.body;
 
+    User.findById(id, (err, userDB) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'User search failed ',
+                errors: err
+            })
+        }
+
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                msg: `The user id: ${ id } not found`
+            })
+        }
+
+        userDB.name = body.name;
+        userDB.name = body.email;
+        userDB.name = body.birthdate;
+        userDB.name = body.avatarUrl;
+        userDB.name = body.role;
+
+        userDB.save((err, userSave) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Error trying to update user',
+                    errors: err
+                })
+            }
+
+            res.status(200).json({
+                ok: true,
+                user: {
+                    name: userSave.name,
+                    email: userSave.email,
+                    birthdate: userSave.birthdate,
+                    avatarUrl: userSave.avatarUrl,
+                    role: userSave.role
+
+                },
+
+            })
+        })
+    })
+}
+
+// ======================================================
+// Create user
+// ======================================================
+const createUser = (req, res) => {
+    const body = req.body;
+    const user = new User({
+        name: body.name,
+        email: body.email,
+        password: bcrypt.hashSync(body.password, 10),
+        birthdate: body.birthdate,
+        avatarUrl: body.avatarUrl,
+        role: body.role
+    });
+
+    user.save((err, userSave) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Error trying to create user',
+                errors: err
+            });
+        }
+
+        res.status(201).json({
+            ok: true,
+            msg: userSave
+        })
+
+    })
+
+}
+
+module.exports = {
+    getUsers,
+    updateUser,
+    createUser
 };

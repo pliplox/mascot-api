@@ -13,19 +13,14 @@ const client = new OAuth2Client(cid);
 async function verify(token) {
     const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: cid // Specify the CLIENT_ID of the app that accesses the backend
-            // Or, if multiple clients access the backend:
-            //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+        audience: cid
     });
 
-    const payload = ticket.getPayload(); //all user information
-    // const userid = payload['sub'];
-    // If request specified a G Suite domain:
-    // const domain = payload['hd'];
+    const payload = ticket.getPayload();
     console.log(payload);
 
     return {
-        nombre: payload.name,
+        name: payload.name,
         email: payload.email,
         img: payload.picture,
         google: true,
@@ -41,6 +36,43 @@ const signInGoogle = async(req, res) => {
                 msg: 'Invalid token'
             });
         });
+
+    User.findOne({ email: googleUser.email }, (err, userDB) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'user search failed',
+                errors: err
+            })
+        }
+
+        if (userDB) {
+            if (!userDB.loginType === 'GOOGLE') { // <- Duda
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'You must use your normal authentication'
+                })
+            } else {
+                const token = jwt.sign({ user: userDB }, process.env.TOKEN_SECRET, { expiresIn: 14400 })
+
+                res.status(200).json({
+                    ok: false,
+                    user: userDB,
+                    token: token,
+                })
+            }
+        } else {
+            // ======================================================
+            // If user no exise: PENDIENTE
+            // ======================================================
+            const user = new User({
+                name: googleUser.name,
+                email: googleUser.email,
+                img: googleUser.img,
+                loginType: 'GOOGLE'
+            });
+        }
+    })
 
     res.status(200).json({
         ok: true,
@@ -98,7 +130,7 @@ const signIn = async(req, res) => {
         }
 
         // ======================================================
-        // verificar contraseña
+        // Verify passwords
         // ======================================================
         if (!bcrypt.compareSync(body.password, userDB.password)) {
             return res.status(400).json({
@@ -107,10 +139,10 @@ const signIn = async(req, res) => {
             });
         }
         // ======================================================
-        // Crear un token 
+        // Create token
         // ======================================================
         var token = jwt.sign({ user: userDB }, process.env.TOKEN_SECRET, { expiresIn: 14400 });
-        userDB.password = '';
+        // userDB.password = '';
         res.status(200).json({
             ok: true,
             id: userDB.id,

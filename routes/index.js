@@ -11,8 +11,9 @@ api.post('/signingoogle', loginController.signInGoogle);
 
 // Users
 api.get('/getusers', usersController.getUsers);
-api.put('/updateuser:id', usersController.updateUser);
+api.put('/updateuser/:id', usersController.updateUser);
 api.post('/createuser', usersController.createUser);
+api.delete('/deleteuser/:id', usersController.deleteUser);
 
 
 module.exports = api;

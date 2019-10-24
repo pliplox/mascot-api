@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 // Get all users
 // ======================================================
 const getUsers = (req, res) => {
-    User.find({}, 'name email createdAt lastLogin', (err, users) => {
+    User.find({}, 'name email createdAt lastLogin birthdate avatarUrl role loginType', (err, users) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -13,7 +13,7 @@ const getUsers = (req, res) => {
                 errors: err
             });
         }
-        User.count({}, (err, size) => {
+        User.countDocuments({}, (err, size) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -53,12 +53,12 @@ const updateUser = (req, res) => {
                 msg: `The user id: ${ id } not found`
             })
         }
+        userDB.name = body.name; // required
+        userDB.email = body.email; // required
+        userDB.birthdate = body.birthdate;
+        userDB.avatarUrl = body.avatarUrl;
+        userDB.role = body.role; // required
 
-        userDB.name = body.name;
-        userDB.name = body.email;
-        userDB.name = body.birthdate;
-        userDB.name = body.avatarUrl;
-        userDB.name = body.role;
 
         userDB.save((err, userSave) => {
             if (err) {
@@ -71,6 +71,7 @@ const updateUser = (req, res) => {
 
             res.status(200).json({
                 ok: true,
+                msg: 'User updated',
                 user: {
                     name: userSave.name,
                     email: userSave.email,
@@ -88,7 +89,7 @@ const updateUser = (req, res) => {
 // ======================================================
 // Create user
 // ======================================================
-const createUser = (req, res) => {
+const createUser = async(req, res) => {
     const body = req.body;
     const user = new User({
         name: body.name,
@@ -99,7 +100,7 @@ const createUser = (req, res) => {
         role: body.role
     });
 
-    user.save((err, userSave) => {
+    await user.save((err, userSave) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -114,11 +115,42 @@ const createUser = (req, res) => {
         })
 
     })
+}
 
+// ======================================================
+// Delete user
+// ======================================================
+const deleteUser = async(req, res) => {
+    const id = req.params.id;
+
+    await User.findByIdAndDelete(id, (err, userDelete) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'User search failed ',
+                errors: err
+            })
+        }
+
+        if (!userDelete) {
+            return res.status(400).json({
+                ok: false,
+                msg: `The user id: ${ id } not found`
+            })
+        }
+
+        res.status(200).json({
+            ok: true,
+            msg: 'User deleted',
+            user: userDelete
+        })
+
+    })
 }
 
 module.exports = {
     getUsers,
     updateUser,
-    createUser
+    createUser,
+    deleteUser
 };

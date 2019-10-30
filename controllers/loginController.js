@@ -23,7 +23,7 @@ async function verify(token) {
         name: payload.name,
         email: payload.email,
         img: payload.picture,
-        google: true,
+        google: 'GOOGLE',
     }
 }
 
@@ -47,7 +47,7 @@ const signInGoogle = async(req, res) => {
         }
 
         if (userDB) {
-            if (!userDB.loginType === 'GOOGLE') { // <- Duda
+            if (userDB.loginType !== 'GOOGLE') { // <- Duda
                 return res.status(400).json({
                     ok: false,
                     msg: 'You must use your normal authentication'
@@ -56,29 +56,55 @@ const signInGoogle = async(req, res) => {
                 const token = jwt.sign({ user: userDB }, process.env.TOKEN_SECRET, { expiresIn: 14400 })
 
                 res.status(200).json({
-                    ok: false,
-                    user: userDB,
-                    token: token,
+                    ok: true,
+                    msg: 'Login with google',
+                    user: {
+                        createAt: userDB.createdAt,
+                        id: userDB.id,
+                        name: userDB.name,
+                        email: userDB.email,
+                        avatarUrl: userDB.avatarUrl,
+                        loginType: userDB.loginType,
+                        avatarUrl: userDB.avatarUrl
+                    },
+                    token: token
                 })
             }
         } else {
-            // ======================================================
-            // If user no exise: PENDIENTE
-            // ======================================================
             const user = new User({
                 name: googleUser.name,
                 email: googleUser.email,
-                img: googleUser.img,
-                loginType: 'GOOGLE'
+                avatarUrl: googleUser.img,
+                loginType: googleUser.google,
+                password: 'SECRET' //the real pass never saved in the Pliplox DB, but yes in the Google DB
             });
+
+            user.save((err, userSave) => {
+                if (err) {
+                    return res.status(400).json({
+                        ok: false,
+                        msg: err
+                    })
+                }
+                const token = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 14400 })
+                return res.status(200).json({
+                    ok: true,
+                    msg: 'User saved in BD',
+                    user: {
+                        createAt: userSave.createdAt,
+                        id: userSave.id,
+                        name: userSave.name,
+                        email: userSave.email,
+                        avatarUrl: userSave.avatarUrl,
+                        loginType: userSave.loginType
+                    },
+                    token: token
+
+                })
+            })
+
         }
     })
-
-    res.status(200).json({
-        ok: true,
-        msg: 'Correct petition',
-        googleUser: googleUser
-    });
 };
 
 // ======================================================

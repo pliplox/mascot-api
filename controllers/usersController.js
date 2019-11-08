@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { registerValidation } = require('../validation');
 
 const signUp = async(req, res) => {
-    const { error } = registerValidation(req.body);
+    const { error } =  registerValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     const emailExist = await User.findOne({ email: req.body.email });
     if (emailExist) return res.status(400).send('Email already exists');
@@ -21,7 +21,7 @@ const signUp = async(req, res) => {
 
     try {
         const savedUser = await user.save();
-        return res.send({ userId: savedUser._id });
+        return res.status(201).send({ userId: savedUser._id });
     } catch (err) {
         return res.status(400).send(err);
     }

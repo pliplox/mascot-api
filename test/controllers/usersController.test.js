@@ -23,9 +23,9 @@ describe('Users Controller', () => {
     });
   });
 
-  afterAll(async () => {
-    await connection.close();
-  });
+  // afterAll(async () => {
+  //   // await connection.close();
+  // });
 
   afterEach(async () => {
     await User.deleteMany({});

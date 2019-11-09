@@ -7,5 +7,4 @@ api.post('/signup', usersController.signUp);
 api.post('/signin', usersController.signIn);
 api.get('/getusers', usersController.getUsers);
 
-
 module.exports = api;

@@ -3,6 +3,39 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { registerValidation, loginValidation } = require('../validation');
 const { OAuth2Client } = require('google-auth-library');
+const request = require('superagent');
+const cicularJSON = require('circular-json');
+
+// ======================================================
+// GitHub Authentication
+// ======================================================
+const signInGitHub = (req, res) => {
+    const code = 'dbea628f1f05a165a7cc';
+    if (!code) {
+        return res.send({
+            ok: false,
+            msg: 'Error: no code'
+        })
+    }
+
+    const clientId = 'cc029f3d6736663ed8eb';
+    const clientSecret = 'a8ba44fbf04cc077909ef753dd9037e01512239c';
+
+    request
+        .post('https://github.com/login/oauth/access_token')
+        .send({ client_id: clientId, client_secret: clientSecret, code: code })
+        // .set('X-API-Key', 'foobar')
+        .set('Accept', 'application/json')
+        .then(resp => {
+            return res.send({
+                resultado: JSON.stringify(resp.body),
+                type: typeof resp.body,
+                resultado2: JSON.parse(JSON.stringify(resp.body))
+            })
+
+        });
+
+}
 
 // ======================================================
 // Google Authentication
@@ -86,7 +119,9 @@ const signInGoogle = async(req, res) => {
                         msg: err
                     })
                 }
-                const token = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 14400 })
+
+                const token = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 900 })
+
                 return res.status(200).json({
                     ok: true,
                     msg: 'User saved in BD',
@@ -185,6 +220,7 @@ const signIn = async(req, res) => {
 module.exports = {
     signUp,
     signIn,
-    signInGoogle
+    signInGoogle,
+    signInGitHub
 
 };

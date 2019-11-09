@@ -8,6 +8,7 @@ const api = express.Router();
 api.post('/signup', loginController.signUp);
 api.post('/signin', loginController.signIn);
 api.post('/signingoogle', loginController.signInGoogle);
+api.get('/signingithub', loginController.signInGitHub);
 
 // Users
 api.get('/getusers', usersController.getUsers);

@@ -1,226 +1,198 @@
+/* eslint-disable consistent-return */
 const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+
 const jwt = require('jsonwebtoken');
-const { registerValidation, loginValidation } = require('../validation');
+
+const cid = process.env.GOOGLE_CLIENT_ID;
 const { OAuth2Client } = require('google-auth-library');
-const request = require('superagent');
-const cicularJSON = require('circular-json');
+
+const client = new OAuth2Client(cid);
+const { registerValidation, loginValidation } = require('../validation');
+const User = require('../models/User');
 
 // ======================================================
-// GitHub Authentication
+// GitHub Authentication TODO: stand by
 // ======================================================
-const signInGitHub = (req, res) => {
-    const code = 'dbea628f1f05a165a7cc';
-    if (!code) {
-        return res.send({
-            ok: false,
-            msg: 'Error: no code'
-        })
-    }
+/* const request = require('superagent');
+ const cicularJSON = require('circular-json');
+ const signInGitHub = (req, res) => {
+  const code = 'dbea628f1f05a165a7cc';
+  if (!code) {
+    return res.send({
+      ok: false,
+      msg: 'Error: no code'
+    });
+  }
 
-    const clientId = 'cc029f3d6736663ed8eb';
-    const clientSecret = 'a8ba44fbf04cc077909ef753dd9037e01512239c';
+  const clientId = 'cc029f3d6736663ed8eb';
+  const clientSecret = 'a8ba44fbf04cc077909ef753dd9037e01512239c';
 
-    request
-        .post('https://github.com/login/oauth/access_token')
-        .send({ client_id: clientId, client_secret: clientSecret, code: code })
-        // .set('X-API-Key', 'foobar')
-        .set('Accept', 'application/json')
-        .then(resp => {
-            return res.send({
-                resultado: JSON.stringify(resp.body),
-                type: typeof resp.body,
-                resultado2: JSON.parse(JSON.stringify(resp.body))
-            })
-
-        });
-
-}
+  request
+    .post('https://github.com/login/oauth/access_token')
+    .send({ client_id: clientId, client_secret: clientSecret, code: code })
+    // .set('X-API-Key', 'foobar')
+    .set('Accept', 'application/json')
+    .then(resp => {
+      return res.send({
+        resultado: JSON.stringify(resp.body),
+        type: typeof resp.body,
+        resultado2: JSON.parse(JSON.stringify(resp.body))
+      });
+    });
+}; */
 
 // ======================================================
 // Google Authentication
 // ======================================================
-const cid = process.env.GOOGLE_CLIENT_ID;
-const client = new OAuth2Client(cid);
-
 async function verify(token) {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: cid
-    });
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: cid
+  });
 
-    const payload = ticket.getPayload();
-    console.log(payload);
-
-    return {
-        name: payload.name,
-        email: payload.email,
-        img: payload.picture,
-        google: 'GOOGLE',
-    }
+  const payload = ticket.getPayload();
+  return {
+    name: payload.name,
+    email: payload.email,
+    img: payload.picture,
+    google: 'GOOGLE'
+  };
 }
 
-const signInGoogle = async(req, res) => {
-    let token = req.body.token;
-    let googleUser = await verify(token)
-        .catch(e => {
-            res.status(403).json({
-                ok: false,
-                msg: 'Invalid token'
-            });
-        });
+const signInGoogle = async (req, res) => {
+  const { token } = req.body;
+  const googleUser = await verify(token).catch(e => {
+    return res.status(403).json({
+      ok: false,
+      msg: `Invalid token: ${e}`
+    });
+  });
 
-    User.findOne({ email: googleUser.email }, (err, userDB) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                msg: 'user search failed',
-                errors: err
-            })
-        }
+  const userExist = await User.findOne({ email: googleUser.email });
+  if (userExist) {
+    const jwtoken = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, { expiresIn: 900 });
 
-        if (userDB) {
-            if (userDB.loginType !== 'GOOGLE') { // <- Duda
-                return res.status(400).json({
-                    ok: false,
-                    msg: 'You must use your normal authentication'
-                })
-            } else {
-                const token = jwt.sign({ user: userDB }, process.env.TOKEN_SECRET, { expiresIn: 14400 })
+    return res.status(200).json({
+      ok: true,
+      msg: 'Login with google',
+      user: {
+        createAt: userExist.createdAt,
+        id: userExist.id,
+        name: userExist.name,
+        email: userExist.email,
+        avatarUrl: userExist.avatarUrl,
+        loginType: userExist.loginType
+      },
+      token: { jwtoken }
+    });
+  }
 
-                res.status(200).json({
-                    ok: true,
-                    msg: 'Login with google',
-                    user: {
-                        createAt: userDB.createdAt,
-                        id: userDB.id,
-                        name: userDB.name,
-                        email: userDB.email,
-                        avatarUrl: userDB.avatarUrl,
-                        loginType: userDB.loginType,
-                        avatarUrl: userDB.avatarUrl
-                    },
-                    token: token
-                })
-            }
-        } else {
-            const user = new User({
-                name: googleUser.name,
-                email: googleUser.email,
-                avatarUrl: googleUser.img,
-                loginType: googleUser.google,
-                password: 'SECRET' //the real pass never saved in the Pliplox DB, but yes in the Google DB
-            });
+  const userGoogle = new User({
+    name: googleUser.name,
+    email: googleUser.email,
+    avatarUrl: googleUser.img,
+    loginType: googleUser.google,
+    password: 'SECRET' // the real pass never saved in the Pliplox DB
+  });
 
-            user.save((err, userSave) => {
-                if (err) {
-                    return res.status(400).json({
-                        ok: false,
-                        msg: err
-                    })
-                }
+  userGoogle.save((saveErr, userSave) => {
+    if (saveErr) {
+      return res.status(400).json({
+        ok: false,
+        msg: saveErr
+      });
+    }
 
-                const token = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 900 })
-
-                return res.status(200).json({
-                    ok: true,
-                    msg: 'User saved in BD',
-                    user: {
-                        createAt: userSave.createdAt,
-                        id: userSave.id,
-                        name: userSave.name,
-                        email: userSave.email,
-                        avatarUrl: userSave.avatarUrl,
-                        loginType: userSave.loginType
-                    },
-                    token: token
-
-                })
-            })
-
-        }
-    })
+    const jwtoken = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 900 });
+    return res.status(200).json({
+      ok: true,
+      msg: 'User saved in DB',
+      user: {
+        createAt: userSave.createdAt,
+        id: userSave.id,
+        name: userSave.name,
+        email: userSave.email,
+        avatarUrl: userSave.avatarUrl,
+        loginType: userSave.loginType
+      },
+      token: { jwtoken }
+    });
+  });
 };
 
 // ======================================================
 // Normal Authentication
 // ======================================================
-const signUp = async(req, res) => {
-    const { error } = registerValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    const emailExist = await User.findOne({ email: req.body.email });
-    if (emailExist) return res.status(400).send('Email already exists');
+const signUp = async (req, res) => {
+  const { error } = registerValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  const emailExist = await User.findOne({ email: req.body.email });
+  if (emailExist) return res.status(400).send({ ok: false, err: 'Email already exists' });
 
-    // ======================================================
-    // Hash the password
-    // ======================================================
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+  // ======================================================
+  // Hash the password
+  // ======================================================
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-    const user = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword
-    });
+  const user = new User({
+    name: req.body.name,
+    email: req.body.email,
+    password: hashedPassword
+  });
 
-    try {
-        const savedUser = await user.save();
-        return res.send({ userId: savedUser._id });
-    } catch (err) {
-        return res.status(400).send(err);
-    }
+  try {
+    const savedUser = await user.save();
+    return res.status(201).send({ userId: savedUser._id });
+  } catch (err) {
+    return res.status(400).send(err);
+  }
 };
 
-const signIn = async(req, res) => {
-    var body = req.body;
+const signIn = async (req, res) => {
+  const { body } = req;
+  const { error } = loginValidation(body);
 
-    await User.findOne({ email: body.email }, (err, userDB) => {
-        if (err) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'user search failed',
-                errors: err
-            });
-        }
+  if (error) return res.status(400).send(error.details[0].message);
+  const userExist = await User.findOne({ email: body.email });
 
-        if (!userDB) {
-            return res.status(401).json({
-                ok: false,
-                msg: `The ${body.email} isn´t correct`
-            });
-        }
+  if (!userExist) return res.status(400).send({ ok: false, err: `User don't exist` });
 
-        // ======================================================
-        // Verify passwords
-        // ======================================================
-        if (!bcrypt.compareSync(body.password, userDB.password)) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'The password isn´t correct'
-            });
-        }
-        // ======================================================
-        // Create token
-        // ======================================================
-        var token = jwt.sign({ user: userDB }, process.env.TOKEN_SECRET, { expiresIn: 14400 });
-        // userDB.password = '';
-        res.status(200).json({
-            ok: true,
-            id: userDB.id,
-            nombre: userDB.name,
-            email: userDB.email,
-            token: token
-
-        });
-
+  // ======================================================
+  // Verify email
+  // ======================================================
+  if (userExist.email !== body.email) {
+    return res.status(401).json({
+      ok: false,
+      msg: `The ${body.email} isn´t correct`
     });
-};
+  }
 
+  // ======================================================
+  // Verify passwords
+  // ======================================================
+  if (!bcrypt.compareSync(body.password, userExist.password)) {
+    return res.status(400).json({
+      ok: false,
+      msg: 'The password isn´t correct'
+    });
+  }
+
+  // ======================================================
+  // Create token
+  // ======================================================
+  const token = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, { expiresIn: 14400 });
+  return res.status(200).json({
+    ok: true,
+    id: userExist.id,
+    nombre: userExist.name,
+    email: userExist.email,
+    token: { token }
+  });
+};
 
 module.exports = {
-    signUp,
-    signIn,
-    signInGoogle,
-    signInGitHub
-
+  signUp,
+  signIn,
+  signInGoogle
 };

@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 const bcrypt = require('bcryptjs');
 
 const jwt = require('jsonwebtoken');
@@ -44,7 +43,7 @@ const User = require('../models/User');
 // ======================================================
 // Google Authentication
 // ======================================================
-async function verify(token) {
+const verify = async token => {
   const ticket = await client.verifyIdToken({
     idToken: token,
     audience: cid
@@ -55,9 +54,9 @@ async function verify(token) {
     name: payload.name,
     email: payload.email,
     img: payload.picture,
-    google: 'GOOGLE'
+    loginType: 'GOOGLE'
   };
-}
+};
 
 const signInGoogle = async (req, res) => {
   const { token } = req.body;
@@ -70,7 +69,7 @@ const signInGoogle = async (req, res) => {
 
   const userExist = await User.findOne({ email: googleUser.email });
   if (userExist) {
-    const jwtoken = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, { expiresIn: 900 });
+    const jwtoken = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, { expiresIn: 900 }); //  15 minutes...
 
     return res.status(200).json({
       ok: true,
@@ -92,7 +91,7 @@ const signInGoogle = async (req, res) => {
     email: googleUser.email,
     avatarUrl: googleUser.img,
     loginType: googleUser.google,
-    password: 'SECRET' // the real pass never saved in the Pliplox DB
+    password: 'SECRET' // plain passwords are never saved in pliplox db
   });
 
   userGoogle.save((saveErr, userSave) => {
@@ -103,7 +102,7 @@ const signInGoogle = async (req, res) => {
       });
     }
 
-    const jwtoken = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 900 });
+    const jwtoken = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 900 }); // 15 minutes...
     return res.status(200).json({
       ok: true,
       msg: 'User saved in DB',
@@ -121,7 +120,7 @@ const signInGoogle = async (req, res) => {
 };
 
 // ======================================================
-// Normal Authentication
+// Register
 // ======================================================
 const signUp = async (req, res) => {
   const { error } = registerValidation(req.body);
@@ -149,6 +148,9 @@ const signUp = async (req, res) => {
   }
 };
 
+// ======================================================
+// Normal Authentication
+// ======================================================
 const signIn = async (req, res) => {
   const { body } = req;
   const { error } = loginValidation(body);

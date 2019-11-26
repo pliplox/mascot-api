@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
@@ -9,7 +8,6 @@ const getUsers = (req, res) => {
   User.find(
     {},
     'name email createdAt lastLogin birthdate avatarUrl role loginType',
-    // eslint-disable-next-line consistent-return
     (err, users) => {
       if (err) {
         return res.status(500).json({

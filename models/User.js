@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 
 const validRoleEnum = {
-  values: ['ADMIN_ROLE', 'USER_ROLE'], //  *** If necessary u can add more roles ***
+  values: ['ADMIN_ROLE', 'USER_ROLE'], //  *** If necessary you can add more roles ***
   message: '{VALUE} it isn´t an allowed role'
 };
 
 const loginTypeEnum = {
-  values: ['NORMAL', 'GOOGLE'], //  *** If necessary u can add more roles ***
+  values: ['NORMAL', 'GOOGLE'], //  *** If necessary you can add more roles ***
   message: '{VALUE} it isn´t an allowed role'
 };
 

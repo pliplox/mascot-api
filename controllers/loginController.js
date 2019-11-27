@@ -94,29 +94,28 @@ const signInGoogle = async (req, res) => {
     password: 'SECRET' // plain passwords are never saved in pliplox db
   });
 
-  userGoogle.save((saveErr, userSave) => {
-    if (saveErr) {
-      return res.status(400).json({
-        ok: false,
-        msg: saveErr
-      });
-    }
-
-    const jwtoken = jwt.sign({ user: userSave }, process.env.TOKEN_SECRET, { expiresIn: 900 }); // 15 minutes...
-    return res.status(200).json({
+  try {
+    const savedUser = await userGoogle.save();
+    const jwtoken = jwt.sign({ user: savedUser }, process.env.TOKEN_SECRET, { expiresIn: 900 }); // 15 minutes...
+    return res.status(200).send({
       ok: true,
       msg: 'User saved in DB',
       user: {
-        createAt: userSave.createdAt,
-        id: userSave.id,
-        name: userSave.name,
-        email: userSave.email,
-        avatarUrl: userSave.avatarUrl,
-        loginType: userSave.loginType
+        createAt: savedUser.createdAt,
+        id: savedUser.id,
+        name: savedUser.name,
+        email: savedUser.email,
+        avatarUrl: savedUser.avatarUrl,
+        loginType: savedUser.loginType
       },
       token: { jwtoken }
     });
-  });
+  } catch (saveErr) {
+    return res.status(400).json({
+      ok: false,
+      msg: saveErr
+    });
+  }
 };
 
 // ======================================================

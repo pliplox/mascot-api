@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 // ======================================================
-// Get all users
+// Get all users FIXME: This method should change the structure or whatever
 // ======================================================
 const getUsers = (req, res) => {
   User.find(
@@ -16,6 +16,7 @@ const getUsers = (req, res) => {
           errors: err
         });
       }
+
       User.countDocuments({}, (errCount, size) => {
         if (errCount) {
           return res.status(500).json({
@@ -31,6 +32,8 @@ const getUsers = (req, res) => {
           users: { users }
         });
       });
+
+      return 'ok'; // FIXME: this is momentary ... pending MB
     }
   );
 };
@@ -96,6 +99,7 @@ const updateUser = (req, res) => {
         }
       });
     });
+    return 'ok'; // FIXME: this is momentary ... pending MB
   });
 };
 
@@ -122,7 +126,7 @@ const createUser = async (req, res) => {
       });
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       ok: true,
       msg: userSave
     });
@@ -151,7 +155,7 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       msg: 'User deleted',
       user: userDelete

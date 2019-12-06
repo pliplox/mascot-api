@@ -1,20 +1,22 @@
+require('dotenv/config');
 const bcrypt = require('bcryptjs');
-
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+const { registerValidation, loginValidation } = require('../validation');
 
 const cid = process.env.GOOGLE_CLIENT_ID;
-const { OAuth2Client } = require('google-auth-library');
-
 const client = new OAuth2Client(cid);
-const { registerValidation, loginValidation } = require('../validation');
 const User = require('../models/User');
+
+// seconds to expire token in normal signIn function (4 hours)
+const SIGN_IN_TIME_OUT = 14400;
 
 // ======================================================
 // GitHub Authentication TODO: stand by
 // ======================================================
 /* const request = require('superagent');
- const cicularJSON = require('circular-json');
- const signInGitHub = (req, res) => {
+  const cicularJSON = require('circular-json');
+  const signInGitHub = (req, res) => {
   const code = 'dbea628f1f05a165a7cc';
   if (!code) {
     return res.send({
@@ -182,13 +184,16 @@ const signIn = async (req, res) => {
   // ======================================================
   // Create token
   // ======================================================
-  const token = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, { expiresIn: 14400 });
+  const token = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, {
+    expiresIn: SIGN_IN_TIME_OUT
+  });
   return res.status(200).json({
     ok: true,
-    id: userExist.id,
-    nombre: userExist.name,
+    userId: userExist.id,
+    name: userExist.name,
     email: userExist.email,
-    token: { token }
+    tokenId: token,
+    expiresIn: 14400
   });
 };
 

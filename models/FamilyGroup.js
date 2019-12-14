@@ -7,10 +7,10 @@ const familyGroupSchema = new Schema({
     type: String,
     required: true
   },
-  familyMembers: [
+  users: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'FamilyMember'
+      ref: 'User'
     }
   ]
 });

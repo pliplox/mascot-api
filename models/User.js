@@ -58,10 +58,10 @@ const userSchema = new Schema({
     default: 'NORMAL',
     enum: loginTypeEnum
   },
-  familyMembers: [
+  familyGroups: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'FamilyMember'
+      ref: 'FamilyGroup'
     }
   ]
 });

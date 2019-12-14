@@ -1,7 +1,6 @@
 const express = require('express');
 const usersController = require('../controllers/usersController');
 const loginController = require('../controllers/loginController');
-const familyMembersController = require('../controllers/familyMembersController');
 const familyGroupsController = require('../controllers/familyGroupsController');
 const auth = require('../middlewares/authentication');
 
@@ -23,14 +22,8 @@ api.delete('/deleteuser/:id', auth, usersController.deleteUser);
 api.post('/family/group', auth, familyGroupsController.createFamilyGroup);
 api.get('/family/groups', auth, familyGroupsController.getFamilyGroups);
 api.get('/family/groups/:groupId', auth, familyGroupsController.getFamilyGroup);
-api.put('/family/groups/:groupId', auth, familyGroupsController.updateFamilyGroup);
-api.delete('/family/groups/:groupId', auth, familyGroupsController.destroyFamilyGroup);
-
-// Family Members
-api.post('/family/member', auth, familyMembersController.createFamilyMember);
-api.get('/family/members', auth, familyMembersController.getFamilyMembers);
-api.get('/family/members/:memberId', auth, familyMembersController.getFamilyMember);
-api.put('/family/members/:memberId', auth, familyMembersController.updateFamilyMember);
-api.delete('/family/members/:memberId', auth, familyMembersController.destroyFamilyMember);
+// uncomment this lines when the refactor for each controller bellow be ready
+// api.put('/family/groups/:groupId', auth, familyGroupsController.updateFamilyGroup);
+// api.delete('/family/groups/:groupId', auth, familyGroupsController.destroyFamilyGroup);
 
 module.exports = api;

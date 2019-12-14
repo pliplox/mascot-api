@@ -1,11 +1,15 @@
 const FamilyGroup = require('../models/FamilyGroup');
-const FamilyMember = require('../models/FamilyMember');
 const User = require('../models/User');
 
 const getFamilyGroups = async (req, res) => {
-  const familyGroups = await FamilyGroup.find();
+  const { userId } = req;
   try {
-    res.status(200).send(familyGroups);
+    const user = await User.findById(userId).populate('familyGroups');
+    const { familyGroups } = user;
+    const familyGroupsArray = familyGroups.map(familyGroup => {
+      return { id: familyGroup._id, name: familyGroup.name };
+    });
+    res.status(200).send(familyGroupsArray);
   } catch (error) {
     res.status(500).send(error);
   }
@@ -13,10 +17,16 @@ const getFamilyGroups = async (req, res) => {
 
 const getFamilyGroup = async (req, res) => {
   const {
+    userId,
     params: { groupId }
   } = req;
   try {
     const familyGroup = await FamilyGroup.findById(groupId);
+    const { users } = familyGroup;
+    const findUser = users.find(user => user.toString() === userId);
+    if (!findUser) {
+      return res.status(401).send({ message: 'You are not authorized to see this information' });
+    }
     return res.status(200).send(familyGroup);
   } catch (error) {
     return res.status(500).send(error.message);
@@ -30,42 +40,52 @@ const createFamilyGroup = async (req, res) => {
   } = req;
 
   const familyGroup = new FamilyGroup({ name });
-  const familyMember = new FamilyMember({ user: userId, familyGroup });
   try {
-    const savedFamilyGroup = await familyGroup.save();
-    const savedFamilyMember = await familyMember.save();
-
-    savedFamilyGroup.familyMembers.push(familyMember);
-    const updatedFamilyGroup = await savedFamilyGroup.save();
     const user = await User.findById(userId);
-    user.familyMembers.push(familyMember);
-    const savedUser = await user.save();
+    familyGroup.users.push(user);
+    const savedFamilyGroup = await familyGroup.save();
+    user.familyGroups.push(savedFamilyGroup);
+    await user.save();
+    const { _id, users } = savedFamilyGroup;
+    const usersArray = users.map(u => {
+      return { id: u._id, name: u.name };
+    });
     return res.status(201).send({
       message: 'Family Group created successfuly',
-      familyGroup: updatedFamilyGroup,
-      familyMember: savedFamilyMember,
-      user: savedUser
+      familyGroup: { id: _id, name, users: usersArray }
     });
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
+// to-do: refactor this to recognize when removin one or more users from this family group
+// and remove the familygroup from those users
 const updateFamilyGroup = async (req, res) => {
   const {
+    userId,
     params: { groupId },
-    body: { name }
+    body: familyGroup
   } = req;
   try {
-    const familyGroup = await FamilyGroup.findById(groupId);
-    familyGroup.name = name;
-    await familyGroup.save();
-    return res.status(200).send(familyGroup);
+    const foundFamilyGroup = await FamilyGroup.findById(groupId);
+    const { users } = foundFamilyGroup;
+    const findUser = users.find(user => user.toString() === userId);
+    if (!findUser) {
+      return res.status(401).send({ message: 'You are not authorized to see this information' });
+    }
+    foundFamilyGroup.users = familyGroup.users;
+    foundFamilyGroup.name = familyGroup.name;
+    const savedFamilyGroup = await foundFamilyGroup.save();
+    return res
+      .status(200)
+      .send({ message: 'Family Group updated successfuly', familyGroup: savedFamilyGroup });
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
+// to-do: refactor this to remove all family groups referenced from users
 const destroyFamilyGroup = async (req, res) => {
   const {
     params: { groupId }

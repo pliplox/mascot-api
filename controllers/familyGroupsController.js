@@ -59,8 +59,8 @@ const createFamilyGroup = async (req, res) => {
   }
 };
 
-// to-do: refactor this to recognize when removin one or more users from this family group
-// and remove the familygroup from those users
+// to-do: refactor this to recognize when removing, adding one or more users from this family group
+// and remove or add the familygroup from those users, yikes
 const updateFamilyGroup = async (req, res) => {
   const {
     userId,
@@ -86,11 +86,13 @@ const updateFamilyGroup = async (req, res) => {
           familyGroupObjectId => familyGroupObjectId.toString() !== groupId
         );
         u.familyGroups = filteredFamilyGroups;
-        await u.save();
+        // by the time, never save the current changes, until confidence of this working
+        // await u.save();
       });
     }
     foundFamilyGroup.users = updatedFamilyGroup.users;
     foundFamilyGroup.name = updatedFamilyGroup.name;
+    // by the time, never save the current changes, until confidence of this working
     // const savedFamilyGroup = await foundFamilyGroup.save();
     return res
       .status(200)

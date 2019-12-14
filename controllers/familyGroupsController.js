@@ -25,7 +25,7 @@ const getFamilyGroup = async (req, res) => {
     const { users } = familyGroup;
     const findUser = users.find(user => user.toString() === userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'You are not authorized to see this information' });
+      return res.status(401).send({ message: 'You are not authorized to access this information' });
     }
     return res.status(200).send(familyGroup);
   } catch (error) {
@@ -65,21 +65,36 @@ const updateFamilyGroup = async (req, res) => {
   const {
     userId,
     params: { groupId },
-    body: familyGroup
+    body: updatedFamilyGroup
   } = req;
+  if (!updatedFamilyGroup) {
+    return res.status(400).send({ message: 'Empty Family Group' });
+  }
   try {
     const foundFamilyGroup = await FamilyGroup.findById(groupId);
     const { users } = foundFamilyGroup;
     const findUser = users.find(user => user.toString() === userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'You are not authorized to see this information' });
+      return res.status(401).send({ message: 'You are not authorized to access this information' });
     }
-    foundFamilyGroup.users = familyGroup.users;
-    foundFamilyGroup.name = familyGroup.name;
-    const savedFamilyGroup = await foundFamilyGroup.save();
+
+    // when removing all users from family group
+    if (!updatedFamilyGroup.users || updatedFamilyGroup.users.length === 0) {
+      foundFamilyGroup.users.forEach(async userIdObject => {
+        const u = await User.findById(userIdObject);
+        const filteredFamilyGroups = u.familyGroups.filter(
+          familyGroupObjectId => familyGroupObjectId.toString() !== groupId
+        );
+        u.familyGroups = filteredFamilyGroups;
+        await u.save();
+      });
+    }
+    foundFamilyGroup.users = updatedFamilyGroup.users;
+    foundFamilyGroup.name = updatedFamilyGroup.name;
+    // const savedFamilyGroup = await foundFamilyGroup.save();
     return res
       .status(200)
-      .send({ message: 'Family Group updated successfuly', familyGroup: savedFamilyGroup });
+      .send({ message: 'Family Group updated successfuly', familyGroup: 'savedFamilyGroup' });
   } catch (error) {
     return res.status(500).send(error);
   }

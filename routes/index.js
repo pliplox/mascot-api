@@ -22,8 +22,7 @@ api.delete('/deleteuser/:id', auth, usersController.deleteUser);
 api.post('/family/group', auth, familyGroupsController.createFamilyGroup);
 api.get('/family/groups', auth, familyGroupsController.getFamilyGroups);
 api.get('/family/groups/:groupId', auth, familyGroupsController.getFamilyGroup);
-// uncomment this lines when the refactor for each controller bellow be ready
-// api.put('/family/groups/:groupId', auth, familyGroupsController.updateFamilyGroup);
-// api.delete('/family/groups/:groupId', auth, familyGroupsController.destroyFamilyGroup);
+api.put('/family/groups/:groupId', auth, familyGroupsController.updateFamilyGroup);
+api.delete('/family/groups/:groupId', auth, familyGroupsController.destroyFamilyGroup);
 
 module.exports = api;

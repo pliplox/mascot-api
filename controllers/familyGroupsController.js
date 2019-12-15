@@ -59,15 +59,13 @@ const createFamilyGroup = async (req, res) => {
   }
 };
 
-// to-do: refactor this to recognize when removing, adding one or more users from this family group
-// and remove or add the familygroup from those users, yikes
 const updateFamilyGroup = async (req, res) => {
   const {
     userId,
     params: { groupId },
-    body: updatedFamilyGroup
+    body: incomingFamilyGroup
   } = req;
-  if (!updatedFamilyGroup) {
+  if (!incomingFamilyGroup) {
     return res.status(400).send({ message: 'Empty Family Group' });
   }
   try {
@@ -79,30 +77,55 @@ const updateFamilyGroup = async (req, res) => {
     }
 
     // when removing all users from family group
-    if (!updatedFamilyGroup.users || updatedFamilyGroup.users.length === 0) {
+    if (!incomingFamilyGroup.users || incomingFamilyGroup.users.length === 0) {
       foundFamilyGroup.users.forEach(async userIdObject => {
         const u = await User.findById(userIdObject);
         const filteredFamilyGroups = u.familyGroups.filter(
           familyGroupObjectId => familyGroupObjectId.toString() !== groupId
         );
         u.familyGroups = filteredFamilyGroups;
-        // by the time, never save the current changes, until confidence of this working
-        // await u.save();
+        await u.save();
       });
     }
-    foundFamilyGroup.users = updatedFamilyGroup.users;
-    foundFamilyGroup.name = updatedFamilyGroup.name;
-    // by the time, never save the current changes, until confidence of this working
-    // const savedFamilyGroup = await foundFamilyGroup.save();
+
+    // check if there are new or removed users
+    if (incomingFamilyGroup.users) {
+      const idUsers = foundFamilyGroup.users.map(userObjectId => userObjectId.toString());
+      // new Users
+      const finalUsers = incomingFamilyGroup.users.filter(user => {
+        return !idUsers.includes(user);
+      });
+      finalUsers.forEach(async finalUserId => {
+        const u = await User.findById(finalUserId);
+        if (!u.familyGroups.includes(groupId)) {
+          u.familyGroups.push(groupId);
+        }
+        await u.save();
+      });
+      // removed users
+      const removedUsers = idUsers.filter(idUser => !incomingFamilyGroup.users.includes(idUser));
+      removedUsers.forEach(async removedUserId => {
+        const u = await User.findById(removedUserId);
+        if (u.familyGroups.includes(groupId)) {
+          const newFamilyGroups = u.familyGroups.filter(familyGroupId => {
+            return familyGroupId.toString() !== groupId;
+          });
+          u.familyGroups = newFamilyGroups;
+        }
+        await u.save();
+      });
+    }
+    foundFamilyGroup.users = incomingFamilyGroup.users;
+    foundFamilyGroup.name = incomingFamilyGroup.name;
+    const savedFamilyGroup = await foundFamilyGroup.save();
     return res
       .status(200)
-      .send({ message: 'Family Group updated successfuly', familyGroup: 'savedFamilyGroup' });
+      .send({ message: 'Family Group updated successfuly', familyGroup: savedFamilyGroup });
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
-// to-do: refactor this to remove all family groups referenced from users
 const destroyFamilyGroup = async (req, res) => {
   const {
     params: { groupId }
@@ -112,6 +135,17 @@ const destroyFamilyGroup = async (req, res) => {
     if (!familyGroup) {
       return res.status(404).send({ message: 'Family Group not found' });
     }
+    if (familyGroup.users.length >= 1) {
+      familyGroup.users.forEach(async userIdObject => {
+        const u = await User.findById(userIdObject);
+        const filteredFamilyGroups = u.familyGroups.filter(
+          familyGroupObjectId => familyGroupObjectId.toString() !== groupId
+        );
+        u.familyGroups = filteredFamilyGroups;
+        await u.save();
+      });
+    }
+    await FamilyGroup.deleteOne(familyGroup);
     return res.status(200).send({ message: 'Family Group destroyed successfuly' });
   } catch (error) {
     return res.status(500).send(error);

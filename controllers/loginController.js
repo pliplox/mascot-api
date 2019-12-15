@@ -143,7 +143,7 @@ const signUp = async (req, res) => {
 
   try {
     const savedUser = await user.save();
-    return res.status(201).send({ userId: savedUser._id });
+    return res.status(201).send({ message: 'User created successfuly', userId: savedUser._id });
   } catch (err) {
     return res.status(400).send(err);
   }

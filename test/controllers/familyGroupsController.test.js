@@ -78,7 +78,61 @@ describe('Family Group Controller', () => {
     });
   });
 
-  // describe('createFamilyGroup', () => {
+  describe('createFamilyGroup', () => {
+    describe('when user creates a family group', () => {
+      beforeEach(async () => User.deleteMany({}));
+      it('returns the created family group object', async () => {
+        const user = new User(mockedUser);
+        const savedUser = await user.save();
+        req.userId = savedUser._id;
+        const mockedName = faker.name.lastName();
+        req.body.name = mockedName;
+        await createFamilyGroup(req, res, next);
+        expect(res._getData().message).toBe('Family Group created successfuly');
+        expect(res._getData().familyGroup).toHaveProperty('id');
+        expect(res._getData().familyGroup).toHaveProperty('name', mockedName);
+        expect(res._getData().familyGroup).toHaveProperty('users');
+      });
+    });
+  });
 
-  // });
+  describe('updateFamilyGroup', () => {
+    describe('when user updates family group', () => {
+      it('returns updated family group', async () => {
+        const user = new User(mockedUser);
+        const familyGroup = new FamilyGroup({ name: faker.name.lastName() });
+        user.familyGroups.push(familyGroup);
+        familyGroup.users.push(user);
+        const savedUser = await user.save();
+        const savedFamilyGroup = await familyGroup.save();
+        req.userId = savedUser._id.toString();
+        req.params.groupId = savedFamilyGroup._id;
+        const mockedName = faker.name.lastName(1);
+        req.body = { name: mockedName, users: [savedUser._id] };
+        await updateFamilyGroup(req, res, next);
+        expect(res._getData().message).toBe('Family Group updated successfuly');
+        expect(res._getData().familyGroup).toHaveProperty('id');
+        expect(res._getData().familyGroup).toHaveProperty('name', mockedName);
+        expect(res._getData().familyGroup).toHaveProperty('users');
+      });
+    });
+  });
+
+  describe('destroyFamilyGroup', () => {
+    describe('when user destroy a family group', () => {
+      beforeEach(async () => User.deleteMany({}));
+      it('returns a successful destroyed message', async () => {
+        const user = new User(mockedUser);
+        const familyGroup = new FamilyGroup({ name: faker.name.lastName() });
+        user.familyGroups.push(familyGroup);
+        familyGroup.users.push(user);
+        await user.save();
+        const savedFamilyGroup = await familyGroup.save();
+        req.params.groupId = savedFamilyGroup._id;
+        await destroyFamilyGroup(req, res, next);
+        expect(res.statusCode).toBe(200);
+        expect(res._getData().message).toBe('Family Group destroyed successfuly');
+      });
+    });
+  });
 });

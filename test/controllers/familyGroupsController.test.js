@@ -98,6 +98,7 @@ describe('Family Group Controller', () => {
 
   describe('updateFamilyGroup', () => {
     describe('when user updates family group', () => {
+      beforeEach(async () => User.deleteMany({}));
       it('returns updated family group', async () => {
         const user = new User(mockedUser);
         const familyGroup = new FamilyGroup({ name: faker.name.lastName() });

@@ -187,7 +187,7 @@ const signIn = async (req, res) => {
   const token = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, {
     expiresIn: SIGN_IN_TIME_OUT
   });
-  return res.status(200).json({
+  return res.status(200).send({
     ok: true,
     userId: userExist.id,
     name: userExist.name,

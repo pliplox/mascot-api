@@ -23,7 +23,7 @@ const getFamilyGroup = async (req, res) => {
   try {
     const familyGroup = await FamilyGroup.findById(groupId);
     const { users } = familyGroup;
-    const findUser = users.find(user => user.toString() === userId);
+    const findUser = users.find(user => user.toString() === userId.toString());
     if (!findUser) {
       return res.status(401).send({ message: 'You are not authorized to access this information' });
     }

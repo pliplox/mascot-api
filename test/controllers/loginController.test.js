@@ -18,7 +18,7 @@ describe('Login Controller', () => {
 
   afterAll(async () => databaseHandler.close());
 
-  afterEach(async () => databaseHandler.clearAll());
+  beforeEach(async () => databaseHandler.clearAll());
 
   // ======================================================
   // SingUp TEST
@@ -48,13 +48,10 @@ describe('Login Controller', () => {
     describe('when user inputs valid data', () => {
       const mockedUser = { name: 'administrador', email: 'admin@admin.cl', password: 'password' };
 
-      beforeEach(() => {
+      beforeEach(async () => {
         req.body = mockedUser;
+        await User.deleteMany({});
       });
-
-      // this is needed because global afterEach not working between those "it"s below.
-      // It may be caused due to asynchronous tasks.
-      afterEach(async () => User.deleteMany());
 
       it('returns 201 status', async () => {
         await loginController.signUp(req, res, next);

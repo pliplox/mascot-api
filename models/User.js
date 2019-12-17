@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 // This is set due to deprecation of 'collection.ensureIndex'
 mongoose.set('useCreateIndex', true);
 
+const { Schema } = mongoose;
+
 const validRoleEnum = {
   values: ['ADMIN_ROLE', 'USER_ROLE'], //  *** If necessary you can add more roles ***
   message: '{VALUE} it isn´t an allowed role'
@@ -12,7 +14,7 @@ const loginTypeEnum = {
   message: '{VALUE} it isn´t an allowed role'
 };
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -55,7 +57,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: 'NORMAL',
     enum: loginTypeEnum
-  }
+  },
+  familyGroups: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'FamilyGroup'
+    }
+  ]
 });
 
 module.exports = mongoose.model('User', userSchema);

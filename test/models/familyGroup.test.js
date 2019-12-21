@@ -17,7 +17,7 @@ describe('Family Group Model', () => {
     const savedFamilyGroup = await validFamilyGroup.save();
 
     expect(savedFamilyGroup._id).toBeDefined();
-    expect(savedFamilyGroup.name).toBe(savedFamilyGroup.name);
+    expect(savedFamilyGroup.name).toBe(familyGroupData.name);
   });
 
   it('not defined field in schema is undefined', async () => {

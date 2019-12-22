@@ -5,7 +5,6 @@ const TimeZone = require('../../models/TimeZone');
 
 // returns random number between 1 and 100
 const offsetMock = Math.round(Math.random() * 100) + 1;
-const invalidOffsetMock = offsetMock * -1;
 const timeZoneMockData = { name: 'Africa/Nairobi', offset: offsetMock };
 
 describe('Time Zone Model', () => {
@@ -47,6 +46,7 @@ describe('Time Zone Model', () => {
   describe('when saving invalid data', () => {
     let timeZoneWithInvalidData;
     let savedTimeZone;
+    const invalidOffsetMock = faker.company.companyName();
     beforeAll(async () => {
       timeZoneWithInvalidData = new TimeZone({
         name: faker.internet.password(),
@@ -69,8 +69,6 @@ describe('Time Zone Model', () => {
 
     it('returns an error offset message', () => {
       const offsetErrorMessage = savedTimeZone.errors.offset.message;
-      // eslint-disable-next-line no-console
-      console.log(offsetErrorMessage);
       expect(offsetErrorMessage).toBeDefined();
     });
   });

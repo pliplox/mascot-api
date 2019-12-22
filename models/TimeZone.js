@@ -14,7 +14,6 @@ const timeZoneSchema = new Schema({
   },
   offset: {
     type: Number,
-    min: 0,
     required: true
   },
   familyGroups: [

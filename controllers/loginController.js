@@ -87,12 +87,11 @@ const signInGoogle = async (req, res) => {
       token: { jwtoken }
     });
   }
-
   const userGoogle = new User({
     name: googleUser.name,
     email: googleUser.email,
     avatarUrl: googleUser.img,
-    loginType: googleUser.google,
+    loginType: googleUser.loginType,
     password: 'SECRET' // plain passwords are never saved in pliplox db
   });
 

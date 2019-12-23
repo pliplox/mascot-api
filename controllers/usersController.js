@@ -29,7 +29,7 @@ const getUsers = (req, res) => {
         return res.status(200).json({
           ok: true,
           total: size,
-          users: { users }
+          users
         });
       });
 

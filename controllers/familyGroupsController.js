@@ -1,5 +1,6 @@
 const FamilyGroup = require('../models/FamilyGroup');
 const User = require('../models/User');
+const TimeZone = require('../models/TimeZone');
 
 const getFamilyGroups = async (req, res) => {
   const { userId } = req;
@@ -36,11 +37,12 @@ const getFamilyGroup = async (req, res) => {
 const createFamilyGroup = async (req, res) => {
   const {
     userId,
-    body: { name }
+    body: { name, timeZoneId }
   } = req;
 
-  const familyGroup = new FamilyGroup({ name });
   try {
+    const timeZone = await TimeZone.findById(timeZoneId);
+    const familyGroup = new FamilyGroup({ name, timeZone });
     const user = await User.findById(userId);
     familyGroup.users.push(user);
     const savedFamilyGroup = await familyGroup.save();
@@ -114,6 +116,13 @@ const updateFamilyGroup = async (req, res) => {
         }
         await u.save();
       });
+    }
+
+    // check if timeZoneId has been changed
+    const timeZone = await TimeZone.findById(incomingFamilyGroup.timeZone);
+    // for some reason comparing two object ids wont work, thats why here it is used "toString()"
+    if (timeZone._id.toString() !== foundFamilyGroup.timeZone.toString()) {
+      foundFamilyGroup.timeZone = timeZone;
     }
     foundFamilyGroup.users = incomingFamilyGroup.users;
     foundFamilyGroup.name = incomingFamilyGroup.name;

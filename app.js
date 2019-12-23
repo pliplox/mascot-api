@@ -8,12 +8,9 @@ const api = require('./routes');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Content-Type, X-Requested-With, Authorization, Content-Type, Accept, Access-Control-Allow-Request-Method'
-  );
-  res.header('Access-Control-Allow-Methods', 'OPTIONS, GET, PATCH, PUT, GET, DELETE');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, PATCH, PUT, GET, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 

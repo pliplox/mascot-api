@@ -1,8 +1,7 @@
-const mongoose = require('mongoose');
 const httpMocks = require('node-mocks-http');
 const loginController = require('../../controllers/loginController');
 const User = require('../../models/User');
-require('dotenv/config');
+const databaseHandler = require('../helpers/databaseHandler');
 
 let req;
 let res;
@@ -15,29 +14,11 @@ beforeEach(() => {
 });
 
 describe('Login Controller', () => {
-  // eslint-disable-next-line no-unused-vars
-  let connection;
-  beforeAll(async () => {
-    try {
-      connection = await mongoose.connect(process.env.MONGODB_URI_TEST, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
-    } catch (error) {
-      console.log(
-        'There was an error trying to connect to the database, see the full error belw: ',
-        error
-      );
-    }
-  });
+  beforeAll(async () => databaseHandler.connect());
 
-  afterAll(async () => {
-    await connection.close();
-  });
+  afterAll(async () => databaseHandler.close());
 
-  afterEach(async () => {
-    await User.deleteMany({});
-  });
+  beforeEach(async () => databaseHandler.clearAll());
 
   // ======================================================
   // SingUp TEST
@@ -67,8 +48,9 @@ describe('Login Controller', () => {
     describe('when user inputs valid data', () => {
       const mockedUser = { name: 'administrador', email: 'admin@admin.cl', password: 'password' };
 
-      beforeEach(() => {
+      beforeEach(async () => {
         req.body = mockedUser;
+        await User.deleteMany({});
       });
 
       it('returns 201 status', async () => {

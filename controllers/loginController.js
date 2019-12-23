@@ -87,12 +87,11 @@ const signInGoogle = async (req, res) => {
       token: { jwtoken }
     });
   }
-
   const userGoogle = new User({
     name: googleUser.name,
     email: googleUser.email,
     avatarUrl: googleUser.img,
-    loginType: googleUser.google,
+    loginType: googleUser.loginType,
     password: 'SECRET' // plain passwords are never saved in pliplox db
   });
 
@@ -143,7 +142,7 @@ const signUp = async (req, res) => {
 
   try {
     const savedUser = await user.save();
-    return res.status(201).send({ userId: savedUser._id });
+    return res.status(201).send({ message: 'User created successfuly', userId: savedUser._id });
   } catch (err) {
     return res.status(400).send(err);
   }
@@ -187,7 +186,7 @@ const signIn = async (req, res) => {
   const token = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, {
     expiresIn: SIGN_IN_TIME_OUT
   });
-  return res.status(200).json({
+  return res.status(200).send({
     ok: true,
     userId: userExist.id,
     name: userExist.name,

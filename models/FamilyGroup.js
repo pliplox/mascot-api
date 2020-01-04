@@ -12,7 +12,12 @@ const familyGroupSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'User'
     }
-  ]
+  ],
+  timeZone: {
+    type: Schema.Types.ObjectId,
+    ref: 'TimeZone',
+    required: true
+  }
 });
 
 module.exports = mongoose.model('FamilyGroup', familyGroupSchema);

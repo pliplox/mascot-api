@@ -7,15 +7,19 @@ const TimeZone = require('../../models/TimeZone');
 const mockName = faker.name.lastName(1);
 
 describe('Family Group Model', () => {
-  beforeAll(async () => databaseHandler.connect());
-
   afterAll(async () => databaseHandler.close());
 
-  beforeEach(async () => databaseHandler.clearAll());
+  beforeAll(async () => databaseHandler.connect());
+
+  let savedTimeZone;
+  beforeEach(async () => {
+    const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 60 });
+    savedTimeZone = await timeZone.save();
+  });
+
+  afterAll(async () => databaseHandler.clearAll());
 
   it('creates and save a Family Group', async () => {
-    const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 60 });
-    const savedTimeZone = await timeZone.save();
     const validFamilyGroup = new FamilyGroup({ name: mockName, timeZone: savedTimeZone });
     const savedFamilyGroup = await validFamilyGroup.save();
 
@@ -24,16 +28,14 @@ describe('Family Group Model', () => {
   });
 
   it('not defined field in schema is undefined', async () => {
-    const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 60 });
-    const savedTimeZone = await timeZone.save();
-    const userWithInvalidField = new FamilyGroup({
+    const familyGroupWithInvalidField = new FamilyGroup({
       timeZone: savedTimeZone,
       name: mockName,
       invalidField: faker.address.zipCode()
     });
-    const savedUserWithInvalidField = await userWithInvalidField.save();
-    expect(savedUserWithInvalidField._id).toBeDefined();
-    expect(savedUserWithInvalidField.invalidField).toBeUndefined();
+    const savedFamilyGroupWithInvalidField = await familyGroupWithInvalidField.save();
+    expect(savedFamilyGroupWithInvalidField._id).toBeDefined();
+    expect(savedFamilyGroupWithInvalidField.invalidField).toBeUndefined();
   });
 
   it('fails when required property is not set', async () => {

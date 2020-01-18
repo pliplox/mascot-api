@@ -124,7 +124,7 @@ const signInGoogle = async (req, res) => {
 // ======================================================
 const signUp = async (req, res) => {
   const { error } = registerValidation(req.body);
-  if (error) res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0].message);
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist) return res.status(400).send({ ok: false, err: 'Email already exists' });
 

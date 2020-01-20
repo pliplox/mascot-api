@@ -33,32 +33,58 @@ beforeEach(() => {
 });
 
 describe('Family Group Controller', () => {
-  beforeAll(async () => databaseHandler.connect());
-
   afterAll(async () => databaseHandler.close());
 
   afterEach(async () => databaseHandler.clearAll());
 
+  let familyGroup;
+  let savedTimeZone;
+  let savedFamilyGroup;
+  let savedUser;
+  let user;
+
+  beforeEach(async () => {
+    databaseHandler.connect();
+
+    // timeZone
+    const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
+    savedTimeZone = await timeZone.save();
+
+    // familyGroup
+    familyGroup = new FamilyGroup({ name: faker.name.lastName(), timeZone: savedTimeZone });
+    user = new User(mockedUser);
+
+    user.familyGroups.push(familyGroup);
+    familyGroup.users.push(user);
+    savedFamilyGroup = await familyGroup.save();
+    savedUser = await user.save();
+  });
+
   describe('getFamilyGroups', () => {
     it('returns all family groups from authenticated user', async () => {
-      req.body = mockedUser;
+      // Sign up the user
+      const userToAuthenticate = { name: userName(), email: email(), password: mockedPassword };
+      req.body = userToAuthenticate;
       await loginController.signUp(req, res, next);
-      req.body = { email: mockedUser.email.toLowerCase(), password: mockedPassword };
+
+      // Sign in the user
+      req.body = { email: userToAuthenticate.email.toLowerCase(), password: mockedPassword };
       await loginController.signIn(req, res, next);
-      const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
-      const savedTimeZone = await timeZone.save();
-      const familyGroup = new FamilyGroup({ name: faker.name.lastName(), timeZone: savedTimeZone });
       const { userId } = res._getData();
+
+      // Assign family group to the user and assign the user to the family group
       familyGroup.users.push(userId);
-      const savedFamilyGroup = await familyGroup.save();
+      const createdFamilyGroup = await familyGroup.save();
       req.userId = userId;
-      const user = await User.findById(userId);
-      user.familyGroups.push(savedFamilyGroup);
-      await user.save();
+      const foundUser = await User.findById(userId);
+      foundUser.familyGroups.push(createdFamilyGroup);
+      await foundUser.save();
+
+      // Test the controller request by authenticated user
       await getFamilyGroups(req, res, next);
       expect(res._getData().length).toBeGreaterThan(0);
       expect(res._getData()).toEqual(
-        expect.arrayContaining([{ id: savedFamilyGroup._id, name: savedFamilyGroup.name }])
+        expect.arrayContaining([{ id: createdFamilyGroup._id, name: createdFamilyGroup.name }])
       );
     });
   });
@@ -66,17 +92,6 @@ describe('Family Group Controller', () => {
   describe('getFamilyGroup', () => {
     describe("when accessing user's family group", () => {
       it('returns the requested family group', async () => {
-        const user = new User(mockedUser);
-        const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
-        const savedTimeZone = await timeZone.save();
-        const familyGroup = new FamilyGroup({
-          name: faker.name.lastName(),
-          timeZone: savedTimeZone
-        });
-        user.familyGroups.push(familyGroup);
-        familyGroup.users.push(user);
-        const savedUser = await user.save();
-        const savedFamilyGroup = await familyGroup.save();
         req.userId = savedUser._id;
         req.params.groupId = savedFamilyGroup._id;
         await getFamilyGroup(req, res, next);
@@ -88,12 +103,7 @@ describe('Family Group Controller', () => {
 
   describe('createFamilyGroup', () => {
     describe('when user creates a family group', () => {
-      beforeEach(async () => User.deleteMany({}));
       it('returns the created family group object', async () => {
-        const user = new User(mockedUser);
-        const savedUser = await user.save();
-        const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
-        const savedTimeZone = await timeZone.save();
         req.userId = savedUser._id;
         const mockedName = faker.name.lastName();
         req.body.name = mockedName;
@@ -109,19 +119,7 @@ describe('Family Group Controller', () => {
 
   describe('updateFamilyGroup', () => {
     describe('when user updates family group', () => {
-      beforeEach(async () => User.deleteMany({}));
       it('returns updated family group', async () => {
-        const user = new User(mockedUser);
-        const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
-        const savedTimeZone = await timeZone.save();
-        const familyGroup = new FamilyGroup({
-          name: faker.name.lastName(),
-          timeZone: savedTimeZone
-        });
-        user.familyGroups.push(familyGroup);
-        familyGroup.users.push(user);
-        const savedUser = await user.save();
-        const savedFamilyGroup = await familyGroup.save();
         req.userId = savedUser._id.toString();
         req.params.groupId = savedFamilyGroup._id;
         const mockedName = faker.name.lastName(1);
@@ -137,19 +135,7 @@ describe('Family Group Controller', () => {
 
   describe('destroyFamilyGroup', () => {
     describe('when user destroy a family group', () => {
-      beforeEach(async () => User.deleteMany({}));
       it('returns a successful destroyed message', async () => {
-        const user = new User(mockedUser);
-        const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
-        const savedTimeZone = await timeZone.save();
-        const familyGroup = new FamilyGroup({
-          name: faker.name.lastName(),
-          timeZone: savedTimeZone
-        });
-        user.familyGroups.push(familyGroup);
-        familyGroup.users.push(user);
-        await user.save();
-        const savedFamilyGroup = await familyGroup.save();
         req.params.groupId = savedFamilyGroup._id;
         await destroyFamilyGroup(req, res, next);
         expect(res.statusCode).toBe(200);

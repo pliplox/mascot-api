@@ -46,6 +46,17 @@ requesteds by using the same branch.
 We use Jest for testing. Don't push code that doesn't have 100% test coverage.
 Integration tests are always welcome. Remember to test exceptions and edge cases too!
 
+To run the tests use the `npm test` command or if you want to watch the changes while coding
+use the `npm run test:watch` command.
+
+To run a single test file use the next command:
+
+`npm run test test/controllers/familyGroupsController.test.js`
+
+if you want to see the changes without having to write the command again, use: 
+
+`npm run test -- --watch test/controllers/familyGroupsController.test.js`
+
 ## Databases
 
 By default, this API is configured to connect to a MongoDB database using Mongoose. You can set the

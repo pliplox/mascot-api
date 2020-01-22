@@ -8,6 +8,7 @@ const petSchema = new Schema({
     required: true
   },
   birthdate: { type: Date },
+  dailyFeeds: { type: Number, default: 2 },
   familyGroups: [
     {
       type: Schema.Types.ObjectId,

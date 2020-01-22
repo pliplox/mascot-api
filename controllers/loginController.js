@@ -21,7 +21,7 @@ const SIGN_IN_TIME_OUT = 14400;
   if (!code) {
     return res.send({
       ok: false,
-      msg: 'Error: no code'
+      err: 'Error: no code'
     });
   }
 
@@ -65,7 +65,7 @@ const signInGoogle = async (req, res) => {
   const googleUser = await verify(token).catch(e => {
     return res.status(403).json({
       ok: false,
-      msg: `Invalid token: ${e}`
+      err: `Invalid token: ${e}`
     });
   });
 
@@ -114,7 +114,7 @@ const signInGoogle = async (req, res) => {
   } catch (saveErr) {
     return res.status(400).json({
       ok: false,
-      msg: saveErr
+      err: saveErr
     });
   }
 };
@@ -124,7 +124,7 @@ const signInGoogle = async (req, res) => {
 // ======================================================
 const signUp = async (req, res) => {
   const { error } = registerValidation(req.body);
-  if (error) res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0].message);
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist) return res.status(400).send({ ok: false, err: 'Email already exists' });
 
@@ -158,25 +158,13 @@ const signIn = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
   const userExist = await User.findOne({ email: body.email });
 
-  if (!userExist) return res.status(400).send({ ok: false, err: `User don't exist` });
-
   // ======================================================
   // Verify email
   // ======================================================
-  if (userExist.email !== body.email) {
+  if (!userExist || !bcrypt.compareSync(body.password, userExist.password)) {
     return res.status(401).json({
       ok: false,
-      msg: `The ${body.email} isn´t correct`
-    });
-  }
-
-  // ======================================================
-  // Verify passwords
-  // ======================================================
-  if (!bcrypt.compareSync(body.password, userExist.password)) {
-    return res.status(400).json({
-      ok: false,
-      msg: 'The password isn´t correct'
+      err: `The email or password is not correct`
     });
   }
 

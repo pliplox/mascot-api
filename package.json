@@ -1,6 +1,6 @@
 {
   "name": "pliplox",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
   "scripts": {

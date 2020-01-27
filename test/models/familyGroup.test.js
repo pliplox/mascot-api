@@ -42,8 +42,8 @@ describe('Family Group Model', () => {
     const familyWithoutRequiredField = new FamilyGroup({ users: faker.random.arrayElement() });
     let err;
     try {
-      const savedUserWithoutRequiredField = await familyWithoutRequiredField.save();
-      err = savedUserWithoutRequiredField;
+      const savedFamilyGroupWithoutRequiredField = await familyWithoutRequiredField.save();
+      err = savedFamilyGroupWithoutRequiredField;
     } catch (error) {
       err = error;
     }

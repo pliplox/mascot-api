@@ -14,6 +14,8 @@ const run = async () => {
   r.context.User = require('./models/User');
   r.context.FamilyGroup = require('./models/FamilyGroup');
   r.context.TimeZone = require('./models/TimeZone');
+  r.context.Pet = require('./models/Pet');
+  r.context.Fed = require('./models/Fed');
 };
 
 run();

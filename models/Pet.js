@@ -9,10 +9,15 @@ const petSchema = new Schema({
   },
   birthdate: { type: Date },
   dailyFeeds: { type: Number, default: 2 },
-  familyGroups: [
+  familyGroup: {
+    type: Schema.Types.ObjectId,
+    ref: 'FamilyGroup',
+    required: true
+  },
+  feds: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'FamilyGroup'
+      ref: 'Fed'
     }
   ]
 });

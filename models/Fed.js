@@ -5,12 +5,12 @@ const { Schema } = mongoose;
 
 const fedSchema = new Schema({
   currentDateTime: {
-    type: Date,
-    required: true
+    type: Date
   },
   pet: {
     type: Schema.Types.ObjectId,
-    ref: 'Pet'
+    ref: 'Pet',
+    required: true
   }
 });
 

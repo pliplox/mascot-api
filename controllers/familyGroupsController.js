@@ -1,6 +1,7 @@
 const FamilyGroup = require('../models/FamilyGroup');
 const User = require('../models/User');
 const TimeZone = require('../models/TimeZone');
+const { findUserInFamilyGroup } = require('../utils/sharedFunctions');
 
 const getFamilyGroups = async (req, res) => {
   const { userId } = req;
@@ -23,8 +24,7 @@ const getFamilyGroup = async (req, res) => {
   } = req;
   try {
     const familyGroup = await FamilyGroup.findById(groupId);
-    const { users } = familyGroup;
-    const findUser = users.find(user => user.toString() === userId.toString());
+    const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
       return res.status(401).send({ message: 'You are not authorized to access this information' });
     }

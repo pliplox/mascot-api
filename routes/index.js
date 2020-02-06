@@ -2,6 +2,7 @@ const express = require('express');
 const usersController = require('../controllers/usersController');
 const loginController = require('../controllers/loginController');
 const familyGroupsController = require('../controllers/familyGroupsController');
+const petsController = require('../controllers/petsController');
 const auth = require('../middlewares/authentication');
 
 const api = express.Router();
@@ -24,5 +25,13 @@ api.get('/family/groups', auth, familyGroupsController.getFamilyGroups);
 api.get('/family/groups/:groupId', auth, familyGroupsController.getFamilyGroup);
 api.put('/family/groups/:groupId', auth, familyGroupsController.updateFamilyGroup);
 api.delete('/family/groups/:groupId', auth, familyGroupsController.destroyFamilyGroup);
+
+// Pet
+const { createPet, getPet, getAllPets, updatePet, destroyPet } = petsController;
+api.post('/pet', auth, createPet);
+api.get('/pet/:petId', auth, getPet);
+api.get('/pet', auth, getAllPets);
+api.put('/pet', auth, updatePet);
+api.delete('/pet', auth, destroyPet);
 
 module.exports = api;

@@ -29,19 +29,75 @@ const createPet = async (req, res) => {
 };
 
 const getPet = async (req, res) => {
-
+  const {
+    body: { petId }
+  } = req;
+  try {
+    const pet = await Pet.findById(petId);
+    if (!pet) return res.status(404).send({ message: 'Pet not found' });
+    return res.status(200).send({ message: 'Pet successfully found', pet });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
 };
 
 const getAllPets = async (req, res) => {
-
+  const {
+    userId,
+    body: { familyGroupId }
+  } = req;
+  try {
+    const familyGroup = await FamilyGroup.findById(familyGroupId);
+    const findUser = findUserInFamilyGroup(familyGroup, userId);
+    if (!findUser) {
+      return res.status(401).send({ message: 'You are not authorized to access this information' });
+    }
+    return res.status(200).send({ message: 'Pets successfully found', pets: familyGroup.pets });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
 };
 
 const updatePet = async (req, res) => {
+  const {
+    userId,
+    body: { pet }
+  } = req;
+  try {
+    const foundPet = await Pet.findById(pet.id).populate('familyGroup');
+    if (!foundPet) return res.status(400).send({ message: 'Pet not found' });
 
+    const { familyGroup } = foundPet;
+    const findUser = findUserInFamilyGroup(familyGroup, userId);
+    if (!findUser) {
+      return res.status(401).send({ message: 'You are not authorized to access this information' });
+    }
+
+    if (!pet) return res.status(404).send({ message: 'Pet not found' });
+
+    const { name, birthdate } = pet;
+    foundPet.name = name;
+    foundPet.birthdate = birthdate;
+    const savedPet = await foundPet.save();
+    return res.status(200).send({ message: 'Pet successfully updated', pet: savedPet });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
 };
 
 const destroyPet = async (req, res) => {
-
+  const {
+    body: { petId }
+  } = req;
+  try {
+    const pet = await Pet.findByIdAndDelete(petId);
+    // const familyGroup = await FamilyGroup.findById(pet.familyGroup);
+    // TO DO: remove pet from family group
+    if (!pet) return res.status(404).send({ message: 'Pet not found' });
+    return res.status(200).send({ message: 'Pet successfully destroyed', pet });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
 };
 
 module.exports = {

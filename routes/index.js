@@ -3,6 +3,7 @@ const usersController = require('../controllers/usersController');
 const loginController = require('../controllers/loginController');
 const familyGroupsController = require('../controllers/familyGroupsController');
 const petsController = require('../controllers/petsController');
+const fedsController = require('../controllers/fedsController');
 const auth = require('../middlewares/authentication');
 
 const api = express.Router();
@@ -33,5 +34,11 @@ api.get('/pet/:petId', auth, getPet);
 api.get('/pet', auth, getAllPets);
 api.put('/pet', auth, updatePet);
 api.delete('/pet', auth, destroyPet);
+
+// Fed
+const { createFed, getFed, destroyFed } = fedsController;
+api.post('/fed', auth, createFed);
+api.get('/fed/:fedId', auth, getFed);
+api.delete('/fed', auth, destroyFed);
 
 module.exports = api;

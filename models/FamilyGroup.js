@@ -26,4 +26,10 @@ const familyGroupSchema = new Schema({
   ]
 });
 
+familyGroupSchema.methods.removePetById = async function removePet(petId) {
+  const filteredPets = this.pets.filter(pet => pet.toString() !== petId.toString());
+  this.pets = filteredPets;
+  await this.save();
+};
+
 module.exports = mongoose.model('FamilyGroup', familyGroupSchema);

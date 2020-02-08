@@ -6,10 +6,10 @@ const createPet = async (req, res) => {
   const {
     userId,
     body: { name, birthdate },
-    params: { groupId }
+    params: { familyGroupId }
   } = req;
   try {
-    const familyGroup = await FamilyGroup.findById(groupId);
+    const familyGroup = await FamilyGroup.findById(familyGroupId);
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
       return res.status(401).send({ message: 'You are not authorized to access this information' });
@@ -18,10 +18,10 @@ const createPet = async (req, res) => {
     const savedPet = await pet.save();
     familyGroup.pets.push(savedPet);
     await familyGroup.save();
-    const { name: savedName, birthdate: savedBirthdate } = savedPet;
+    const { _id: id, name: savedName, birthdate: savedBirthdate } = savedPet;
     return res.status(201).send({
-      message: 'Pet created successfuly',
-      pet: { name: savedName, birthdate: savedBirthdate }
+      message: 'Pet created successfully',
+      pet: { id, name: savedName, birthdate: savedBirthdate }
     });
   } catch (error) {
     return res.status(500).send(error.message);
@@ -30,7 +30,7 @@ const createPet = async (req, res) => {
 
 const getPet = async (req, res) => {
   const {
-    body: { petId }
+    params: { petId }
   } = req;
   try {
     const pet = await Pet.findById(petId);
@@ -44,10 +44,10 @@ const getPet = async (req, res) => {
 const getAllPets = async (req, res) => {
   const {
     userId,
-    body: { familyGroupId }
+    params: { familyGroupId }
   } = req;
   try {
-    const familyGroup = await FamilyGroup.findById(familyGroupId);
+    const familyGroup = await FamilyGroup.findById(familyGroupId).populate('pets');
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
       return res.status(401).send({ message: 'You are not authorized to access this information' });
@@ -91,8 +91,8 @@ const destroyPet = async (req, res) => {
   } = req;
   try {
     const pet = await Pet.findByIdAndDelete(petId);
-    // const familyGroup = await FamilyGroup.findById(pet.familyGroup);
-    // TO DO: remove pet from family group
+    const familyGroup = await FamilyGroup.findById(pet.familyGroup);
+    await familyGroup.removePetById(petId);
     if (!pet) return res.status(404).send({ message: 'Pet not found' });
     return res.status(200).send({ message: 'Pet successfully destroyed', pet });
   } catch (error) {

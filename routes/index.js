@@ -9,7 +9,7 @@ const auth = require('../middlewares/authentication');
 const api = express.Router();
 
 // Login
-api.post('/signup', auth, loginController.signUp);
+api.post('/signup', loginController.signUp);
 api.post('/signin', loginController.signIn);
 api.post('/signingoogle', loginController.signInGoogle);
 // api.get('/signingithub', loginController.signInGitHub); // TODO: StandBy

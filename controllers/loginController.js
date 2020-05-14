@@ -120,7 +120,7 @@ const signInGoogle = async (req, res) => {
 };
 
 // ======================================================
-// Register
+// Sign Up
 // ======================================================
 const signUp = async (req, res) => {
   const { error } = registerValidation(req.body);

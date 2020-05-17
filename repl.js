@@ -9,7 +9,7 @@ const run = async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  const r = repl.start('skollapp > ');
+  const r = repl.start('mascotapp > ');
 
   // If there are other models, that are not here, please add them.
   r.context.User = require('./models/User');

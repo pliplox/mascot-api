@@ -8,7 +8,7 @@
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --detectOpenHandles --forceExit --watch",
     "server": "NODE_ENV=development nodemon index.js",
-    "repl": "NODE_OPTIONS=--experimental-repl-await node repl.js"
+    "repl": "NODE_ENV=development NODE_OPTIONS=--experimental-repl-await node repl.js"
   },
   "jest": {
     "testEnvironment": "node",

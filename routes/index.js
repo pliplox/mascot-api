@@ -31,7 +31,7 @@ api.delete('/family/groups/:groupId', auth, familyGroupsController.destroyFamily
 const { createPet, getPet, getAllPets, updatePet, destroyPet } = petsController;
 api.post('/pet/:familyGroupId', auth, createPet);
 api.get('/pet/:petId', auth, getPet);
-api.get('/pet', auth, getAllPets);
+api.get('/pets/:familyGroupId', auth, getAllPets);
 api.put('/pet', auth, updatePet);
 api.delete('/pet', auth, destroyPet);
 

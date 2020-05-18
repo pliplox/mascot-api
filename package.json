@@ -4,11 +4,11 @@
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "NODE_ENV=production node index.js",
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --detectOpenHandles --forceExit --watch",
-    "server": "nodemon index.js",
-    "repl": "NODE_OPTIONS=--experimental-repl-await node repl.js"
+    "server": "NODE_ENV=development nodemon index.js",
+    "repl": "NODE_ENV=development NODE_OPTIONS=--experimental-repl-await node repl.js"
   },
   "jest": {
     "testEnvironment": "node",

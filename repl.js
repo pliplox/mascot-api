@@ -2,13 +2,14 @@
 require('dotenv/config');
 const repl = require('repl');
 const mongoose = require('mongoose');
+const mongodbUri = require('./config');
 
 const run = async () => {
-  await mongoose.connect(process.env.MONGODB_URI, {
+  await mongoose.connect(mongodbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  const r = repl.start('skollapp > ');
+  const r = repl.start('mascotapp > ');
 
   // If there are other models, that are not here, please add them.
   r.context.User = require('./models/User');

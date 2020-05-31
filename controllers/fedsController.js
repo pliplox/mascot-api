@@ -1,8 +1,10 @@
 const Fed = require('../models/Fed');
 const Pet = require('../models/Pet');
+const User = require('../models/User');
 
 const createFed = async (req, res) => {
   const {
+    userId,
     body: { petId }
   } = req;
 
@@ -10,7 +12,10 @@ const createFed = async (req, res) => {
     const pet = await Pet.findById(petId);
     if (!pet) return res.status(404).send({ message: 'Pet not found' });
 
-    const fed = await Fed.create({ pet });
+    const user = await User.findById(userId);
+    const fed = await Fed.create({ pet, user });
+    pet.feds.push(fed);
+    await pet.save();
     return res.status(201).send({ message: 'Fed added successfully', fed });
   } catch (error) {
     return res.status(500).send({ message: error.message });

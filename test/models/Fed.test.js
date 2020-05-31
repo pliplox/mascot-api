@@ -5,14 +5,18 @@ const Pet = require('../../models/Pet');
 const FamilyGroup = require('../../models/FamilyGroup');
 const TimeZone = require('../../models/TimeZone');
 const Fed = require('../../models/Fed');
+const User = require('../../models/User');
 
 const timeZoneMock = { name: 'Africa/Nairobi', offset: 10 };
 const familyGroupMock = { name: faker.internet.userName() };
 const petMockData = { name: faker.internet.userName(), birthdate: new Date() };
+const userMockData = { name: 'name', email: 'email@test.cl', password: 'password' };
+
 let pet;
 let timeZone;
 let familyGroup;
 let fed;
+let user;
 
 describe('Fed model', () => {
   afterAll(async () => databaseHandler.close());
@@ -21,6 +25,8 @@ describe('Fed model', () => {
     databaseHandler.connect();
     timeZone = new TimeZone(timeZoneMock);
     familyGroup = new FamilyGroup(familyGroupMock);
+    user = new User(userMockData);
+    const savedUser = await user.save();
 
     const savedTimeZone = await timeZone.save();
     familyGroup.timeZone = savedTimeZone;
@@ -32,7 +38,7 @@ describe('Fed model', () => {
     pet.familyGroup = savedFamilyGroup;
     const savedPet = await pet.save();
 
-    fed = new Fed({ pet: savedPet });
+    fed = new Fed({ pet: savedPet, user: savedUser });
   });
 
   afterAll(async () => databaseHandler.clearAll());
@@ -47,7 +53,7 @@ describe('Fed model', () => {
     const savedFed = await fed.save();
 
     const dt = new Date();
-    dt.setHours(dt.getHours() + timeZone.offset);
+    // dt.setHours(dt.getHours() + timeZone.offset);
 
     // only testing hours because it may be a delay using minutes and seconds
     expect(savedFed.currentDateTime.getHours()).toBe(dt.getHours());

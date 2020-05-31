@@ -7,17 +7,17 @@ const TimeZone = require('../../models/TimeZone');
 const mockName = faker.name.lastName(1);
 
 describe('Family Group Model', () => {
+  beforeAll(async () => databaseHandler.connect());
+
   afterAll(async () => databaseHandler.close());
 
-  beforeAll(async () => databaseHandler.connect());
+  afterEach(async () => databaseHandler.clearAll());
 
   let savedTimeZone;
   beforeEach(async () => {
     const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 60 });
     savedTimeZone = await timeZone.save();
   });
-
-  afterAll(async () => databaseHandler.clearAll());
 
   it('creates and save a Family Group', async () => {
     const validFamilyGroup = new FamilyGroup({ name: mockName, timeZone: savedTimeZone });

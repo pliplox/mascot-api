@@ -19,10 +19,15 @@ let fed;
 let user;
 
 describe('Fed model', () => {
-  afterAll(async () => databaseHandler.close());
+  beforeAll(async () => databaseHandler.connect());
 
-  beforeAll(async () => {
-    databaseHandler.connect();
+  afterAll(async () => {
+    await databaseHandler.clearAll();
+    await databaseHandler.close();
+  });
+
+  beforeEach(async () => {
+    await databaseHandler.clearAll();
     timeZone = new TimeZone(timeZoneMock);
     familyGroup = new FamilyGroup(familyGroupMock);
     user = new User(userMockData);
@@ -41,8 +46,6 @@ describe('Fed model', () => {
     fed = new Fed({ pet: savedPet, user: savedUser });
   });
 
-  afterAll(async () => databaseHandler.clearAll());
-
   it('creates and save Fed', async () => {
     const savedFed = await fed.save();
 
@@ -60,7 +63,8 @@ describe('Fed model', () => {
   });
 
   it('not defined field in schema is undefined', async () => {
-    const fedWithInvalidField = new Fed({ pet, invalidField: faker.address.zipCode() });
+    // const new = User.create({ name: 'newuser', email: 'email@new.email', password: 'password' });
+    const fedWithInvalidField = new Fed({ pet, user, invalidField: faker.address.zipCode() });
     const savedFedWithInvalidField = await fedWithInvalidField.save();
 
     expect(savedFedWithInvalidField._id).toBeDefined();

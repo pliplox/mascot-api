@@ -6,6 +6,7 @@ const TimeZone = require('../../models/TimeZone');
 const FamilyGroup = require('../../models/FamilyGroup');
 const User = require('../../models/User');
 const Pet = require('../../models/Pet');
+require('../../models/Fed'); // to be called when getAllPets is called
 
 const databaseHandler = require('../helpers/databaseHandler');
 
@@ -33,9 +34,12 @@ beforeEach(() => {
 });
 
 describe('Pets Controller', () => {
-  afterAll(async () => databaseHandler.close());
+  afterAll(async () => {
+    await databaseHandler.close();
+    await databaseHandler.clearAll();
+  });
 
-  afterEach(async () => databaseHandler.clearAll());
+  // afterEach(async () => databaseHandler.clearAll());
 
   let familyGroup;
   let pet;

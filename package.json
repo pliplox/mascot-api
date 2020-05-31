@@ -7,6 +7,8 @@
     "start": "NODE_ENV=production node index.js",
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --detectOpenHandles --forceExit --watch",
+    "test:debug": "node --inspect node_modules/.bin/jest --detectOpenHandles",
+    "test:debug:windows": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --detectOpenHandles",
     "server": "NODE_ENV=development nodemon index.js",
     "repl": "NODE_ENV=development NODE_OPTIONS=--experimental-repl-await node repl.js"
   },

@@ -13,10 +13,13 @@ let timeZone;
 let familyGroup;
 
 describe('Pet model', () => {
+  beforeAll(async () => databaseHandler.connect());
+
   afterAll(async () => databaseHandler.close());
 
-  beforeAll(async () => {
-    databaseHandler.connect();
+  afterEach(async () => databaseHandler.clearAll());
+
+  beforeEach(async () => {
     timeZone = new TimeZone(timeZoneMock);
     familyGroup = new FamilyGroup(familyGroupMock);
 
@@ -27,8 +30,6 @@ describe('Pet model', () => {
 
     pet = new Pet(petMockData);
   });
-
-  afterAll(async () => databaseHandler.clearAll());
 
   it('creates and save a Pet', async () => {
     pet.familyGroup = familyGroup;

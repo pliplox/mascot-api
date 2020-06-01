@@ -6,6 +6,7 @@ const FamilyGroup = require('../../models/FamilyGroup');
 const Fed = require('../../models/Fed');
 const Pet = require('../../models/Pet');
 const TimeZone = require('../../models/TimeZone');
+const User = require('../../models/User');
 
 // controllers
 const { signIn, signUp } = require('../../controllers/loginController');
@@ -22,18 +23,24 @@ beforeEach(() => {
 });
 
 describe('Feds Controller', () => {
+  const mockUserData = {
+    name: 'Joe Profaci',
+    email: 'joe.profaci@mafia.com',
+    password: '123123'
+  };
+
   let fed;
   let pet;
 
   let savedFamilyGroup;
+
+  beforeAll(async () => databaseHandler.connect());
 
   afterAll(async () => databaseHandler.close());
 
   afterEach(async () => databaseHandler.clearAll());
 
   beforeEach(async () => {
-    await databaseHandler.connect();
-
     // timeZone
     const timeZone = await TimeZone.create({ name: 'Africa/Accra', offset: 2 });
 
@@ -42,11 +49,7 @@ describe('Feds Controller', () => {
     // savedFamilyGroup = await familyGroup.save();
 
     // Sign up the user
-    const userToAuthenticate = {
-      name: 'Joe Profaci',
-      email: 'joe.profaci@mafia.com',
-      password: '123123'
-    };
+    const userToAuthenticate = mockUserData;
     req.body = userToAuthenticate;
     await signUp(req, res, next);
 
@@ -56,11 +59,14 @@ describe('Feds Controller', () => {
     const { userId } = res._getData();
     req.userId = userId;
 
+    const user = await User.findById(userId);
+
     // pet
     pet = await Pet.create({
       name: 'Capone',
       birthdate: new Date(),
-      familyGroup
+      familyGroup,
+      user
     });
 
     familyGroup.pets.push(pet);
@@ -83,13 +89,15 @@ describe('Feds Controller', () => {
       const familyGroup = new FamilyGroup({ name: 'Bonanno', timeZone });
       savedFamilyGroup = await familyGroup.save();
 
+      const user = await User.create({ ...mockUserData, email: 'email@test.cl' });
+
       pet = await Pet.create({
         name: 'Capone',
         birthdate: new Date(),
         familyGroup: savedFamilyGroup
       });
 
-      fed = await Fed.create({ pet });
+      fed = await Fed.create({ pet, user });
     });
 
     it('returns the requested fed', async () => {
@@ -114,7 +122,9 @@ describe('Feds Controller', () => {
         familyGroup: savedFamilyGroup
       });
 
-      fedToDestroy = await Fed.create({ pet });
+      const user = await User.create({ ...mockUserData, email: 'new@email.cl' });
+
+      fedToDestroy = await Fed.create({ pet, user });
     });
 
     it('destroys the fed', async () => {

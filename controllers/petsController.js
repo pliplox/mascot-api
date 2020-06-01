@@ -47,7 +47,16 @@ const getAllPets = async (req, res) => {
     params: { familyGroupId }
   } = req;
   try {
-    const familyGroup = await FamilyGroup.findById(familyGroupId).populate('pets');
+    const startOfDay = new Date().setHours(0, 0, 0);
+    const endOfDay = new Date().setHours(23, 59, 59);
+    const familyGroup = await FamilyGroup.findById(familyGroupId).populate({
+      path: 'pets',
+      populate: {
+        path: 'feds',
+        match: { currentDateTime: { $gte: startOfDay, $lt: endOfDay } },
+        populate: { path: 'user' }
+      }
+    });
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
       return res.status(401).send({ message: 'You are not authorized to access this information' });

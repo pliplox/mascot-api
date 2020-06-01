@@ -33,6 +33,8 @@ beforeEach(() => {
 });
 
 describe('Family Group Controller', () => {
+  beforeAll(async () => databaseHandler.connect());
+
   afterAll(async () => databaseHandler.close());
 
   afterEach(async () => databaseHandler.clearAll());
@@ -44,8 +46,6 @@ describe('Family Group Controller', () => {
   let user;
 
   beforeEach(async () => {
-    databaseHandler.connect();
-
     // timeZone
     const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
     savedTimeZone = await timeZone.save();

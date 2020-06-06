@@ -10,7 +10,9 @@
     "test:debug": "node --inspect node_modules/.bin/jest --detectOpenHandles",
     "test:debug:windows": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --detectOpenHandles",
     "server": "NODE_ENV=development nodemon index.js",
-    "repl": "NODE_ENV=development NODE_OPTIONS=--experimental-repl-await node repl.js"
+    "server:windows": "SET NODE_ENV=development& nodemon index.js",
+    "repl": "NODE_ENV=development NODE_OPTIONS=--experimental-repl-await node repl.js",
+    "repl:windows": "SET NODE_ENV=development&&SET NODE_OPTIONS=--experimental-repl-await& node repl.js"
   },
   "jest": {
     "testEnvironment": "node",

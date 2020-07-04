@@ -1,14 +1,18 @@
 {
   "name": "pliplox",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "NODE_ENV=production node index.js",
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --detectOpenHandles --forceExit --watch",
-    "server": "nodemon index.js",
-    "repl": "NODE_OPTIONS=--experimental-repl-await node repl.js"
+    "test:debug": "node --inspect node_modules/.bin/jest --detectOpenHandles",
+    "test:debug:windows": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --detectOpenHandles",
+    "server": "NODE_ENV=development nodemon index.js",
+    "server:windows": "SET NODE_ENV=development& nodemon index.js",
+    "repl": "NODE_ENV=development NODE_OPTIONS=--experimental-repl-await node repl.js",
+    "repl:windows": "SET NODE_ENV=development&&SET NODE_OPTIONS=--experimental-repl-await& node repl.js"
   },
   "jest": {
     "testEnvironment": "node",

@@ -33,6 +33,8 @@ beforeEach(() => {
 });
 
 describe('Family Group Controller', () => {
+  beforeAll(async () => databaseHandler.connect());
+
   afterAll(async () => databaseHandler.close());
 
   afterEach(async () => databaseHandler.clearAll());
@@ -44,8 +46,6 @@ describe('Family Group Controller', () => {
   let user;
 
   beforeEach(async () => {
-    databaseHandler.connect();
-
     // timeZone
     const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
     savedTimeZone = await timeZone.save();
@@ -109,7 +109,7 @@ describe('Family Group Controller', () => {
         req.body.name = mockedName;
         req.body.timeZoneId = savedTimeZone;
         await createFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('Family Group created successfuly');
+        expect(res._getData().message).toBe('Family Group created successfully');
         expect(res._getData().familyGroup).toHaveProperty('id');
         expect(res._getData().familyGroup).toHaveProperty('name', mockedName);
         expect(res._getData().familyGroup).toHaveProperty('users');
@@ -125,7 +125,7 @@ describe('Family Group Controller', () => {
         const mockedName = faker.name.lastName(1);
         req.body = { name: mockedName, users: [savedUser._id], timeZone: savedTimeZone._id };
         await updateFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('Family Group updated successfuly');
+        expect(res._getData().message).toBe('Family Group updated successfully');
         expect(res._getData().familyGroup).toHaveProperty('id');
         expect(res._getData().familyGroup).toHaveProperty('name', mockedName);
         expect(res._getData().familyGroup).toHaveProperty('users');
@@ -139,7 +139,7 @@ describe('Family Group Controller', () => {
         req.params.groupId = savedFamilyGroup._id;
         await destroyFamilyGroup(req, res, next);
         expect(res.statusCode).toBe(200);
-        expect(res._getData().message).toBe('Family Group destroyed successfuly');
+        expect(res._getData().message).toBe('Family Group destroyed successfully');
       });
     });
   });

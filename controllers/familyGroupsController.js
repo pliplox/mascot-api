@@ -1,6 +1,7 @@
 const FamilyGroup = require('../models/FamilyGroup');
 const User = require('../models/User');
 const TimeZone = require('../models/TimeZone');
+const { findUserInFamilyGroup } = require('../utils/sharedFunctions');
 
 const getFamilyGroups = async (req, res) => {
   const { userId } = req;
@@ -23,8 +24,7 @@ const getFamilyGroup = async (req, res) => {
   } = req;
   try {
     const familyGroup = await FamilyGroup.findById(groupId);
-    const { users } = familyGroup;
-    const findUser = users.find(user => user.toString() === userId.toString());
+    const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
       return res.status(401).send({ message: 'You are not authorized to access this information' });
     }
@@ -53,7 +53,7 @@ const createFamilyGroup = async (req, res) => {
       return { id: u._id, name: u.name };
     });
     return res.status(201).send({
-      message: 'Family Group created successfuly',
+      message: 'Family Group created successfully',
       familyGroup: { id: _id, name, users: usersArray }
     });
   } catch (error) {
@@ -129,7 +129,7 @@ const updateFamilyGroup = async (req, res) => {
     const savedFamilyGroup = await foundFamilyGroup.save();
     return res
       .status(200)
-      .send({ message: 'Family Group updated successfuly', familyGroup: savedFamilyGroup });
+      .send({ message: 'Family Group updated successfully', familyGroup: savedFamilyGroup });
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -155,7 +155,7 @@ const destroyFamilyGroup = async (req, res) => {
       });
     }
     await FamilyGroup.deleteOne(familyGroup);
-    return res.status(200).send({ message: 'Family Group destroyed successfuly' });
+    return res.status(200).send({ message: 'Family Group destroyed successfully' });
   } catch (error) {
     return res.status(500).send(error);
   }

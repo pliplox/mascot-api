@@ -9,12 +9,23 @@ const petSchema = new Schema({
   },
   birthdate: { type: Date },
   dailyFeeds: { type: Number, default: 2 },
-  familyGroups: [
+  familyGroup: {
+    type: Schema.Types.ObjectId,
+    ref: 'FamilyGroup',
+    required: true
+  },
+  feds: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'FamilyGroup'
+      ref: 'Fed'
     }
   ]
 });
+
+petSchema.methods.removeFedById = async function removeFed(fedId) {
+  const filteredFeds = this.feds.filter(fed => fed.toString() !== fedId.toString());
+  this.feds = filteredFeds;
+  await this.save();
+};
 
 module.exports = mongoose.model('Pet', petSchema);

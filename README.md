@@ -1,6 +1,6 @@
-# SkollApp Backend
+# Mascot-api Backend
 
-The back-end project for SkollApp
+The back-end project for Mascot-api
 
 ## Getting started
 
@@ -61,7 +61,7 @@ if you want to see the changes without having to write the command again, use:
 
 By default, this API is configured to connect to a MongoDB database using Mongoose. You can set the
 database, creating a `.env` file in the root of the project and adding the next line of code
-`MONGODB_URI=mongodb://localhost/skollapp` 
+`MONGODB_URI=mongodb://localhost/mascot-api` 
 
 ## REPL
 

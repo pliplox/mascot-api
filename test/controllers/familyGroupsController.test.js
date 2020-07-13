@@ -3,7 +3,7 @@ const faker = require('faker');
 const familyGroupsController = require('../../controllers/familyGroupsController');
 const FamilyGroup = require('../../models/FamilyGroup');
 const TimeZone = require('../../models/TimeZone');
-const loginController = require('../../controllers/loginController');
+const authController = require('../../controllers/authController');
 const User = require('../../models/User');
 
 const databaseHandler = require('../helpers/databaseHandler');
@@ -65,11 +65,11 @@ describe('Family Group Controller', () => {
       // Sign up the user
       const userToAuthenticate = { name: userName(), email: email(), password: mockedPassword };
       req.body = userToAuthenticate;
-      await loginController.signUp(req, res, next);
+      await authController.signUp(req, res, next);
 
       // Sign in the user
       req.body = { email: userToAuthenticate.email.toLowerCase(), password: mockedPassword };
-      await loginController.signIn(req, res, next);
+      await authController.signIn(req, res, next);
       const { userId } = res._getData();
 
       // Assign family group to the user and assign the user to the family group

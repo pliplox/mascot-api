@@ -1,7 +1,7 @@
 const httpMocks = require('node-mocks-http');
 const faker = require('faker');
 const petsController = require('../../controllers/petsController');
-const loginController = require('../../controllers/loginController');
+const authController = require('../../controllers/authController');
 const TimeZone = require('../../models/TimeZone');
 const FamilyGroup = require('../../models/FamilyGroup');
 const User = require('../../models/User');
@@ -64,11 +64,11 @@ describe('Pets Controller', () => {
       password: mockedPassword
     };
     req.body = userToAuthenticate;
-    await loginController.signUp(req, res, next);
+    await authController.signUp(req, res, next);
 
     // Sign in the user
     req.body = { email: userToAuthenticate.email, password: mockedPassword };
-    await loginController.signIn(req, res, next);
+    await authController.signIn(req, res, next);
     const { userId } = res._getData();
 
     // Assign family group to the user and assign the user to the family group

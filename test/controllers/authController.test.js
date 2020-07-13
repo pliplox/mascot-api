@@ -1,5 +1,5 @@
 const httpMocks = require('node-mocks-http');
-const loginController = require('../../controllers/loginController');
+const authController = require('../../controllers/authController');
 const User = require('../../models/User');
 const databaseHandler = require('../helpers/databaseHandler');
 
@@ -25,7 +25,7 @@ describe('Login Controller', () => {
   // ======================================================
   describe('signUp', () => {
     it('signUp is a function', () => {
-      expect(typeof loginController.signUp).toBe('function');
+      expect(typeof authController.signUp).toBe('function');
     });
 
     describe('when user inputs invalid data', () => {
@@ -33,13 +33,13 @@ describe('Login Controller', () => {
       const mockedUser2 = { name: 'Naruto', email: 'notemail', password: 'password ' };
       it('returns 400 status if name length is minor than 6', () => {
         req.body = mockedUser;
-        loginController.signUp(req, res, next);
+        authController.signUp(req, res, next);
         expect(res.statusCode).toBe(400);
       });
 
       it('returns an error message', () => {
         req.body = mockedUser2;
-        loginController.signUp(req, res, next);
+        authController.signUp(req, res, next);
         // to-do: here this should import the validates errors... or not (?)
         expect(res._getData()).toBe('"email" must be a valid email');
       });
@@ -54,12 +54,12 @@ describe('Login Controller', () => {
       });
 
       it('returns 201 status', async () => {
-        await loginController.signUp(req, res, next);
+        await authController.signUp(req, res, next);
         expect(res.statusCode).toBe(201);
       });
 
       it('returns user id', async () => {
-        await loginController.signUp(req, res, next);
+        await authController.signUp(req, res, next);
         const user = await User.findById(res._getData().userId);
         expect(res._getData().userId).toStrictEqual(user._id);
       });
@@ -71,7 +71,7 @@ describe('Login Controller', () => {
   // ======================================================
   describe('signIn', () => {
     it('singIn is a function', () => {
-      expect(typeof loginController.signIn).toBe('function');
+      expect(typeof authController.signIn).toBe('function');
     });
 
     describe('when user inputs invalid data', () => {
@@ -79,13 +79,13 @@ describe('Login Controller', () => {
       const mockedUser2 = { email: 'test2test2cla', password: 'password' };
       it('return 400 status if user email invalid format', () => {
         req.body = mockedUser;
-        loginController.signIn(req, res, next);
+        authController.signIn(req, res, next);
         expect(res.statusCode).toBe(400);
       });
 
       it('return an error message', () => {
         req.body = mockedUser2;
-        loginController.signIn(req, res, next);
+        authController.signIn(req, res, next);
         expect(res._getData()).toBe('"email" must be a valid email');
       });
     });

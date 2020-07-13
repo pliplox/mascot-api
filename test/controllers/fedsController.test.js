@@ -9,7 +9,7 @@ const TimeZone = require('../../models/TimeZone');
 const User = require('../../models/User');
 
 // controllers
-const { signIn, signUp } = require('../../controllers/loginController');
+const { signIn, signUp } = require('../../controllers/authController');
 const { createFed, getFed, destroyFed } = require('../../controllers/fedsController');
 
 let req;

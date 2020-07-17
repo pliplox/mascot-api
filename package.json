@@ -12,9 +12,9 @@
     "server:local": "cross-env NODE_ENV=local nodemon index.js",
     "server:staging": "cross-env NODE_ENV=staging nodemon index.js",
     "server:production": "cross-env NODE_ENV=production nodemon index.js",
-    "repl:local": "NODE_ENV=local NODE_OPTIONS=--experimental-repl-await node repl.js",
-    "repl:staging": "NODE_ENV=staging NODE_OPTIONS=--experimental-repl-await node repl.js",
-    "repl:production": "NODE_ENV=production NODE_OPTIONS=--experimental-repl-await node repl.js"
+    "repl:local": "cross-env NODE_ENV=local NODE_OPTIONS=--experimental-repl-await node repl.js",
+    "repl:staging": "cross-env NODE_ENV=staging NODE_OPTIONS=--experimental-repl-await node repl.js",
+    "repl:production": "cross-env NODE_ENV=production NODE_OPTIONS=--experimental-repl-await node repl.js"
   },
   "jest": {
     "testEnvironment": "node",

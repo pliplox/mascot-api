@@ -1,3 +1,4 @@
+version: 2.1
 filter:
   branches:
     only:
@@ -5,11 +6,12 @@ filter:
       - develop
 jobs:
   test:
+    working_directory: ~/mascot-api
     executor: node/default
     steps:
       - checkout
       - node/install-packages:
-          cache-path: ~/project/node_modules
+          cache-path: ~/mascot-api/node_modules
           override-ci-command: npm install
       - run: npm run test
 orbs:

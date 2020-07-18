@@ -4,7 +4,7 @@
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env API_ENV=production NODE_ENV=production node index.js",
+    "start": "NODE_ENV=production node index.js",
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --detectOpenHandles --forceExit --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --detectOpenHandles",

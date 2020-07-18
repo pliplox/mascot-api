@@ -5,7 +5,7 @@ const mongodbUri = () => {
     production: process.env.MONGODB_URI_PRODUCTION
   };
 
-  return processObject[process.env.NODE_ENV];
+  return processObject[process.env.API_ENV];
 };
 
 module.exports = mongodbUri();

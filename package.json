@@ -4,15 +4,17 @@
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --detectOpenHandles --forceExit --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --detectOpenHandles",
     "test:debug:windows": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --detectOpenHandles",
-    "server": "NODE_ENV=development nodemon index.js",
-    "server:windows": "SET NODE_ENV=development& nodemon index.js",
-    "repl": "NODE_ENV=development NODE_OPTIONS=--experimental-repl-await node repl.js",
-    "repl:windows": "SET NODE_ENV=development&&SET NODE_OPTIONS=--experimental-repl-await& node repl.js"
+    "server:local": "cross-env NODE_ENV=local nodemon index.js",
+    "server:staging": "cross-env NODE_ENV=staging nodemon index.js",
+    "server:production": "cross-env NODE_ENV=production nodemon index.js",
+    "repl:local": "cross-env NODE_ENV=local NODE_OPTIONS=--experimental-repl-await node repl.js",
+    "repl:staging": "cross-env NODE_ENV=staging NODE_OPTIONS=--experimental-repl-await node repl.js",
+    "repl:production": "cross-env NODE_ENV=production NODE_OPTIONS=--experimental-repl-await node repl.js"
   },
   "jest": {
     "testEnvironment": "node",
@@ -45,6 +47,7 @@
   },
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.1.3",
+    "cross-env": "^7.0.2",
     "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.4.0",

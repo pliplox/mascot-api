@@ -13,7 +13,7 @@ jobs:
           override-ci-command: npm install
       - run: npm run test
 orbs:
-  node: 'circleci/node:13.12.0'
+  node: 'circleci/node:3.0.1'
 version: 2.1
 workflows:
   tests:

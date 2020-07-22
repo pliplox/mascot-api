@@ -102,7 +102,7 @@ describe('Family Group Controller', () => {
   });
 
   describe('createFamilyGroup', () => {
-    describe('when user not exist', () => {
+    describe('when user does not exist', () => {
       it('returns message the user not exist', async () => {
         req.userId = null;
         const mockedName = faker.name.lastName();

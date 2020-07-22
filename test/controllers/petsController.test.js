@@ -82,8 +82,11 @@ describe('Pets Controller', () => {
 
   describe('createPet', () => {
     it('creates a pet', async () => {
-      req.body = { name: petNameMock, birthdate: petBirthdateMock };
-      req.params.familyGroupId = savedFamilyGroup._id;
+      req.body = {
+        name: petNameMock,
+        birthdate: petBirthdateMock,
+        familyGroupId: savedFamilyGroup._id
+      };
       await createPet(req, res, next);
       expect(res.statusCode).toBe(201);
       expect(res._getData().message).toBe('Pet created successfully');

@@ -29,7 +29,7 @@ api.delete('/family/groups/:groupId', auth, familyGroupsController.destroyFamily
 
 // Pet
 const { createPet, getPet, getAllPets, updatePet, destroyPet } = petsController;
-api.post('/pet/:familyGroupId', auth, createPet);
+api.post('/pet', auth, createPet);
 api.get('/pet/:petId', auth, getPet);
 api.get('/pets/:familyGroupId', auth, getAllPets);
 api.put('/pet', auth, updatePet);

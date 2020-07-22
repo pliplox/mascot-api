@@ -9,6 +9,7 @@ const User = require('../../models/User');
 const databaseHandler = require('../helpers/databaseHandler');
 
 const mockedPassword = '123123';
+
 const {
   internet: { userName, email }
 } = faker;
@@ -41,6 +42,7 @@ describe('Family Group Controller', () => {
 
   let familyGroup;
   let savedTimeZone;
+  let timeZoneNull;
   let savedFamilyGroup;
   let savedUser;
   let user;
@@ -49,7 +51,7 @@ describe('Family Group Controller', () => {
     // timeZone
     const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
     savedTimeZone = await timeZone.save();
-
+    timeZoneNull = null;
     // familyGroup
     familyGroup = new FamilyGroup({ name: faker.name.lastName(), timeZone: savedTimeZone });
     user = new User(mockedUser);
@@ -102,6 +104,16 @@ describe('Family Group Controller', () => {
   });
 
   describe('createFamilyGroup', () => {
+    describe('when timezone not exist', () => {
+      it('returns message the timezone not exist', async () => {
+        req.userId = savedUser._id;
+        const mockedName = faker.name.lastName();
+        req.body.name = mockedName;
+        req.body.timeZoneId = timeZoneNull;
+        await createFamilyGroup(req, res, next);
+        expect(res._getData().message).toBe('Timezone not exist');
+      });
+    });
     describe('when user creates a family group', () => {
       it('returns the created family group object', async () => {
         req.userId = savedUser._id;

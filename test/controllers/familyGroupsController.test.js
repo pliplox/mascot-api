@@ -103,7 +103,7 @@ describe('Family Group Controller', () => {
 
   describe('createFamilyGroup', () => {
     describe('when user does not exist', () => {
-      it('returns message the user not exist', async () => {
+      it('returns a not found message', async () => {
         req.userId = null;
         const mockedName = faker.name.lastName();
         req.body.name = mockedName;
@@ -112,8 +112,8 @@ describe('Family Group Controller', () => {
         expect(res._getData().message).toBe('User not found');
       });
     });
-    describe('when timezone not exist', () => {
-      it('returns message the timezone not exist', async () => {
+    describe('when timezone does not exist', () => {
+      it('returns a not found message', async () => {
         req.userId = savedUser._id;
         const mockedName = faker.name.lastName();
         req.body.name = mockedName;

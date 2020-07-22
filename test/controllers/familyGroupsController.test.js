@@ -42,8 +42,6 @@ describe('Family Group Controller', () => {
 
   let familyGroup;
   let savedTimeZone;
-  let timeZoneNull;
-  let userNull;
   let savedFamilyGroup;
   let savedUser;
   let user;
@@ -52,8 +50,6 @@ describe('Family Group Controller', () => {
     // timeZone
     const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
     savedTimeZone = await timeZone.save();
-    timeZoneNull = null;
-    userNull = null;
     // familyGroup
     familyGroup = new FamilyGroup({ name: faker.name.lastName(), timeZone: savedTimeZone });
     user = new User(mockedUser);
@@ -108,12 +104,12 @@ describe('Family Group Controller', () => {
   describe('createFamilyGroup', () => {
     describe('when user not exist', () => {
       it('returns message the user not exist', async () => {
-        req.userId = userNull;
+        req.userId = null;
         const mockedName = faker.name.lastName();
         req.body.name = mockedName;
         req.body.timeZoneId = savedTimeZone;
         await createFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('User not exist');
+        expect(res._getData().message).toBe('User not found');
       });
     });
     describe('when timezone not exist', () => {
@@ -121,9 +117,9 @@ describe('Family Group Controller', () => {
         req.userId = savedUser._id;
         const mockedName = faker.name.lastName();
         req.body.name = mockedName;
-        req.body.timeZoneId = timeZoneNull;
+        req.body.timeZoneId = null;
         await createFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('Timezone not exist');
+        expect(res._getData().message).toBe('Timezone not found');
       });
     });
     describe('when user creates a family group', () => {

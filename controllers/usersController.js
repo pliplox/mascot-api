@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 // ======================================================
@@ -107,15 +107,14 @@ const updateUser = (req, res) => {
 // Create user
 // ======================================================
 const createUser = async (req, res) => {
-  const { body } = req;
-  const user = new User({
-    name: body.name,
-    email: body.email,
-    password: bcrypt.hashSync(body.password, 10),
-    birthdate: body.birthdate,
-    avatarUrl: body.avatarUrl,
-    role: body.role
-  });
+  const { name, email, password, birthdate, avatarUrl, role } = req.body;
+  const user = new User();
+  user.name = name;
+  user.email = email;
+  user.password = await user.encryptPassword(password);
+  user.birthdate = birthdate;
+  user.avatarUrl = avatarUrl;
+  user.role = role;
 
   await user.save((err, userSave) => {
     if (err) {

@@ -127,18 +127,10 @@ const signUp = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist) return res.status(400).send({ ok: false, err: 'Email already exists' });
-
-  // ======================================================
-  // Hash the password
-  // ======================================================
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-  const user = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: hashedPassword
-  });
+  const user = new User();
+  user.name = req.body.name;
+  user.email = req.body.email;
+  user.password = await user.encryptPassword(req.body.password);
 
   try {
     const savedUser = await user.save();

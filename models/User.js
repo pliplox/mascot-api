@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 // This is set due to deprecation of 'collection.ensureIndex'
 mongoose.set('useCreateIndex', true);
 
@@ -65,5 +66,10 @@ const userSchema = new Schema({
     }
   ]
 });
+
+userSchema.methods.encryptPassword = async function encrypt(pass) {
+  const hashpass = await bcrypt.hashSync(pass, 10);
+  return hashpass;
+};
 
 module.exports = mongoose.model('User', userSchema);

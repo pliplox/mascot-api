@@ -1,4 +1,3 @@
-// const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 // ======================================================
@@ -111,7 +110,7 @@ const createUser = async (req, res) => {
   const user = new User();
   user.name = name;
   user.email = email;
-  user.password = await user.encryptPassword(password);
+  user.password = password;
   user.birthdate = birthdate;
   user.avatarUrl = avatarUrl;
   user.role = role;

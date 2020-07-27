@@ -67,9 +67,14 @@ const userSchema = new Schema({
   ]
 });
 
-userSchema.methods.encryptPassword = async function encrypt(pass) {
-  const hashpass = await bcrypt.hashSync(pass, 10);
-  return hashpass;
-};
+// eslint-disable-next-line func-names
+userSchema.pre('save', async function(next) {
+  // eslint-disable-next-line prefer-const
+  let user = this;
+  const hash = await bcrypt.hash(user.password, 10);
+  if (!hash) next(new Error('Error hashing the password'));
+  user.password = hash;
+  next();
+});
 
 module.exports = mongoose.model('User', userSchema);

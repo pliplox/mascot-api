@@ -82,14 +82,16 @@ describe('Login Controller', () => {
       expect(typeof authController.signIn).toBe('function');
     });
 
-    describe('when user inputs invalid data', () => {
-      it('returns status 400 if user email invalid format', () => {
+    describe('Invalid email', () => {
+      it('returns status 400', () => {
         const mockedUser1 = { email: 'it is not email', password: mockedPassword };
         req.body = mockedUser1;
         authController.signIn(req, res, next);
         expect(res.statusCode).toBe(400);
       });
+    });
 
+    describe('when user inputs invalid data', () => {
       it('returns an error message', () => {
         const mockedUser2 = { email: 'test2test2cla', password: mockedPassword };
         req.body = mockedUser2;

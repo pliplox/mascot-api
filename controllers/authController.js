@@ -130,7 +130,7 @@ const signUp = async (req, res) => {
   const user = new User();
   user.name = req.body.name;
   user.email = req.body.email;
-  user.password = await user.encryptPassword(req.body.password);
+  user.password = req.body.password;
 
   try {
     const savedUser = await user.save();

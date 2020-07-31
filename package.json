@@ -1,6 +1,6 @@
 {
   "name": "pliplox",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
   "scripts": {
@@ -42,7 +42,6 @@
     "jsonwebtoken": "^8.5.1",
     "luxon": "^1.21.3",
     "mongoose": "^5.7.4",
-    "node-mocks-http": "^1.8.0",
     "superagent": "^5.1.0"
   },
   "devDependencies": {
@@ -55,7 +54,7 @@
     "eslint-plugin-prettier": "^3.1.1",
     "jest": "^24.9.0",
     "node-mocks-http": "^1.8.0",
-    "nodemon": "^1.19.3",
+    "nodemon": "^2.0.4",
     "prettier": "1.18.2"
   }
 }

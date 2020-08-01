@@ -9,9 +9,12 @@ jobs:
     steps:
       - checkout
       - node/install-packages:
+          pkg-manager: yarn
           cache-path: ~/project/node_modules
           override-ci-command: yarn install
-      - run: yarn test
+      - run: 
+          command: yarn test
+          name: Run YARN tests
 orbs:
   node: 'circleci/node@3.0.1'
 version: 2.1

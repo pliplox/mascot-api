@@ -20,7 +20,7 @@ beforeEach(() => {
   next = null;
 });
 
-describe('Login Controller', () => {
+describe('Authentication Controller', () => {
   beforeAll(async () => databaseHandler.openConnection());
 
   afterAll(async () => databaseHandler.closeConnection());

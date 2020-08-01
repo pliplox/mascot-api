@@ -21,11 +21,11 @@ beforeEach(() => {
 });
 
 describe('Login Controller', () => {
-  beforeAll(async () => databaseHandler.connect());
+  beforeAll(async () => databaseHandler.openConnection());
 
-  afterAll(async () => databaseHandler.close());
+  afterAll(async () => databaseHandler.closeConnection());
 
-  afterEach(async () => databaseHandler.clearAll());
+  afterEach(async () => databaseHandler.deleteCollections());
 
   // ======================================================
   // SingUp TEST
@@ -47,7 +47,7 @@ describe('Login Controller', () => {
         const mockedUser2 = { name: 'Naruto', email: 'it is not email', password: mockedPassword };
         req.body = mockedUser2;
         authController.signUp(req, res, next);
-        // to-do: here this should import the validates errors... or not (?)
+        // TODO: here this should import the validated errors... or not (?)
         expect(res._getData()).toBe('"email" must be a valid email');
       });
     });

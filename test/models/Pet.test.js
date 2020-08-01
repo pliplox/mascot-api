@@ -13,11 +13,11 @@ let timeZone;
 let familyGroup;
 
 describe('Pet model', () => {
-  beforeAll(async () => databaseHandler.connect());
+  beforeAll(async () => databaseHandler.openConnection());
 
-  afterAll(async () => databaseHandler.close());
+  afterAll(async () => databaseHandler.closeConnection());
 
-  afterEach(async () => databaseHandler.clearAll());
+  afterEach(async () => databaseHandler.deleteCollections());
 
   beforeEach(async () => {
     timeZone = new TimeZone(timeZoneMock);

@@ -8,11 +8,17 @@ const offsetMock = Math.round(Math.random() * 100) + 1;
 const timeZoneMockData = { name: 'Africa/Nairobi', offset: offsetMock };
 
 describe('Time Zone Model', () => {
-  beforeAll(async () => databaseHandler.connect());
+  beforeAll(async () => databaseHandler.openConnection());
 
-  afterAll(async () => databaseHandler.close());
+  /**
+   * Clear all test data after every test.
+   */
+  afterEach(async () => databaseHandler.deleteCollections());
 
-  beforeEach(async () => databaseHandler.clearAll());
+  /**
+   * Remove and close the db and server.
+   */
+  afterAll(async () => databaseHandler.closeConnection());
 
   it('creates and save a Time Zone', async () => {
     const timeZone = new TimeZone(timeZoneMockData);

@@ -10,8 +10,8 @@ jobs:
       - checkout
       - node/install-packages:
           cache-path: ~/project/node_modules
-          override-ci-command: npm install
-      - run: npm run test
+          override-ci-command: yarn install
+      - run: yarn test
 orbs:
   node: 'circleci/node@3.0.1'
 version: 2.1

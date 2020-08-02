@@ -1,6 +1,11 @@
-const mongodbUri =
-  process.env.NODE_ENV === 'development'
-    ? 'mongodb://localhost/mascotapp'
-    : process.env.MONGODB_URI;
+const mongodbUri = () => {
+  const processObject = {
+    local: 'mongodb://localhost/mascotapp',
+    staging: process.env.MONGODB_URI_STAGING,
+    production: process.env.MONGODB_URI_PRODUCTION
+  };
 
-module.exports = mongodbUri;
+  return processObject[process.env.API_ENV];
+};
+
+module.exports = mongodbUri();

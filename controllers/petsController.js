@@ -5,8 +5,7 @@ const { findUserInFamilyGroup } = require('../utils/sharedFunctions');
 const createPet = async (req, res) => {
   const {
     userId,
-    body: { name, birthdate },
-    params: { familyGroupId }
+    body: { name, birthdate, familyGroupId }
   } = req;
   try {
     const familyGroup = await FamilyGroup.findById(familyGroupId);

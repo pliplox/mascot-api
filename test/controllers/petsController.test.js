@@ -1,7 +1,7 @@
 const httpMocks = require('node-mocks-http');
 const faker = require('faker');
 const petsController = require('../../controllers/petsController');
-const loginController = require('../../controllers/loginController');
+const authController = require('../../controllers/authController');
 const TimeZone = require('../../models/TimeZone');
 const FamilyGroup = require('../../models/FamilyGroup');
 const User = require('../../models/User');
@@ -34,12 +34,11 @@ beforeEach(() => {
 });
 
 describe('Pets Controller', () => {
-  afterAll(async () => {
-    await databaseHandler.close();
-    await databaseHandler.clearAll();
-  });
+  beforeAll(async () => databaseHandler.openConnection());
 
-  // afterEach(async () => databaseHandler.clearAll());
+  afterAll(async () => databaseHandler.closeConnection());
+
+  afterEach(async () => databaseHandler.deleteCollections());
 
   let familyGroup;
   let pet;
@@ -48,8 +47,6 @@ describe('Pets Controller', () => {
   let savedTimeZone;
 
   beforeEach(async () => {
-    await databaseHandler.connect();
-
     // timeZone
     const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
     savedTimeZone = await timeZone.save();
@@ -64,11 +61,11 @@ describe('Pets Controller', () => {
       password: mockedPassword
     };
     req.body = userToAuthenticate;
-    await loginController.signUp(req, res, next);
+    await authController.signUp(req, res, next);
 
     // Sign in the user
     req.body = { email: userToAuthenticate.email, password: mockedPassword };
-    await loginController.signIn(req, res, next);
+    await authController.signIn(req, res, next);
     const { userId } = res._getData();
 
     // Assign family group to the user and assign the user to the family group
@@ -82,8 +79,11 @@ describe('Pets Controller', () => {
 
   describe('createPet', () => {
     it('creates a pet', async () => {
-      req.body = { name: petNameMock, birthdate: petBirthdateMock };
-      req.params.familyGroupId = savedFamilyGroup._id;
+      req.body = {
+        name: petNameMock,
+        birthdate: petBirthdateMock,
+        familyGroupId: savedFamilyGroup._id
+      };
       await createPet(req, res, next);
       expect(res.statusCode).toBe(201);
       expect(res._getData().message).toBe('Pet created successfully');
@@ -139,7 +139,8 @@ describe('Pets Controller', () => {
       req.params.familyGroupId = familyGroupWithPets._id;
     });
 
-    it('returns all pets from a family group', async () => {
+    // TODO: re-do this test with better mocks
+    it.skip('returns all pets from a family group', async () => {
       await getAllPets(req, res, next);
       expect(res.statusCode).toBe(200);
       expect(res._getData().pets.length).toBe(2);

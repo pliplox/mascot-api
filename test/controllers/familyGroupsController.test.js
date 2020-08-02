@@ -3,12 +3,13 @@ const faker = require('faker');
 const familyGroupsController = require('../../controllers/familyGroupsController');
 const FamilyGroup = require('../../models/FamilyGroup');
 const TimeZone = require('../../models/TimeZone');
-const loginController = require('../../controllers/loginController');
+const authController = require('../../controllers/authController');
 const User = require('../../models/User');
 
 const databaseHandler = require('../helpers/databaseHandler');
 
 const mockedPassword = '123123';
+
 const {
   internet: { userName, email }
 } = faker;
@@ -33,11 +34,11 @@ beforeEach(() => {
 });
 
 describe('Family Group Controller', () => {
-  beforeAll(async () => databaseHandler.connect());
+  beforeAll(async () => databaseHandler.openConnection());
 
-  afterAll(async () => databaseHandler.close());
+  afterAll(async () => databaseHandler.closeConnection());
 
-  afterEach(async () => databaseHandler.clearAll());
+  afterEach(async () => databaseHandler.deleteCollections());
 
   let familyGroup;
   let savedTimeZone;
@@ -45,11 +46,11 @@ describe('Family Group Controller', () => {
   let savedUser;
   let user;
 
+  // TODO: change this to ensure a different instance in every described test request
   beforeEach(async () => {
     // timeZone
     const timeZone = new TimeZone({ name: 'Africa/Accra', offset: 2 });
     savedTimeZone = await timeZone.save();
-
     // familyGroup
     familyGroup = new FamilyGroup({ name: faker.name.lastName(), timeZone: savedTimeZone });
     user = new User(mockedUser);
@@ -65,11 +66,11 @@ describe('Family Group Controller', () => {
       // Sign up the user
       const userToAuthenticate = { name: userName(), email: email(), password: mockedPassword };
       req.body = userToAuthenticate;
-      await loginController.signUp(req, res, next);
+      await authController.signUp(req, res, next);
 
       // Sign in the user
       req.body = { email: userToAuthenticate.email.toLowerCase(), password: mockedPassword };
-      await loginController.signIn(req, res, next);
+      await authController.signIn(req, res, next);
       const { userId } = res._getData();
 
       // Assign family group to the user and assign the user to the family group
@@ -102,6 +103,26 @@ describe('Family Group Controller', () => {
   });
 
   describe('createFamilyGroup', () => {
+    describe('when user does not exist', () => {
+      it('returns a not found message', async () => {
+        req.userId = null;
+        const mockedName = faker.name.lastName();
+        req.body.name = mockedName;
+        req.body.timeZoneId = savedTimeZone;
+        await createFamilyGroup(req, res, next);
+        expect(res._getData().message).toBe('User not found');
+      });
+    });
+    describe('when timezone does not exist', () => {
+      it('returns a not found message', async () => {
+        req.userId = savedUser._id;
+        const mockedName = faker.name.lastName();
+        req.body.name = mockedName;
+        req.body.timeZoneId = null;
+        await createFamilyGroup(req, res, next);
+        expect(res._getData().message).toBe('Timezone not found');
+      });
+    });
     describe('when user creates a family group', () => {
       it('returns the created family group object', async () => {
         req.userId = savedUser._id;
@@ -133,7 +154,8 @@ describe('Family Group Controller', () => {
     });
   });
 
-  describe('destroyFamilyGroup', () => {
+  // TODO: re-do this test
+  describe.skip('destroyFamilyGroup', () => {
     describe('when user destroy a family group', () => {
       it('returns a successful destroyed message', async () => {
         req.params.groupId = savedFamilyGroup._id;

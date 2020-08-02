@@ -7,11 +7,11 @@ const TimeZone = require('../../models/TimeZone');
 const mockName = faker.name.lastName(1);
 
 describe('Family Group Model', () => {
-  beforeAll(async () => databaseHandler.connect());
+  beforeAll(async () => databaseHandler.openConnection());
 
-  afterAll(async () => databaseHandler.close());
+  afterAll(async () => databaseHandler.closeConnection());
 
-  afterEach(async () => databaseHandler.clearAll());
+  afterEach(async () => databaseHandler.deleteCollections());
 
   let savedTimeZone;
   beforeEach(async () => {

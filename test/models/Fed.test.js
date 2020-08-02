@@ -19,15 +19,13 @@ let fed;
 let user;
 
 describe('Fed model', () => {
-  beforeAll(async () => databaseHandler.connect());
+  beforeAll(async () => databaseHandler.openConnection());
 
-  afterAll(async () => {
-    await databaseHandler.clearAll();
-    await databaseHandler.close();
-  });
+  afterAll(async () => databaseHandler.closeConnection());
+
+  afterEach(async () => databaseHandler.deleteCollections());
 
   beforeEach(async () => {
-    await databaseHandler.clearAll();
     timeZone = new TimeZone(timeZoneMock);
     familyGroup = new FamilyGroup(familyGroupMock);
     user = new User(userMockData);

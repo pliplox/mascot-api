@@ -11,7 +11,7 @@ const createPet = async (req, res) => {
     const familyGroup = await FamilyGroup.findById(familyGroupId);
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'You are not authorized to access this information' });
+      return res.status(401).send({ message: 'No está autorizado a acceder a esta información' });
     }
     const pet = new Pet({ name, birthdate, familyGroup });
     const savedPet = await pet.save();
@@ -19,7 +19,7 @@ const createPet = async (req, res) => {
     await familyGroup.save();
     const { _id: id, name: savedName, birthdate: savedBirthdate } = savedPet;
     return res.status(201).send({
-      message: 'Pet created successfully',
+      message: 'Mascota creada con éxito',
       pet: { id, name: savedName, birthdate: savedBirthdate }
     });
   } catch (error) {
@@ -33,8 +33,8 @@ const getPet = async (req, res) => {
   } = req;
   try {
     const pet = await Pet.findById(petId);
-    if (!pet) return res.status(404).send({ message: 'Pet not found' });
-    return res.status(200).send({ message: 'Pet successfully found', pet });
+    if (!pet) return res.status(404).send({ message: 'Mascota no exontrada' });
+    return res.status(200).send({ message: 'Mascota encontrado con éxito', pet });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -58,9 +58,11 @@ const getAllPets = async (req, res) => {
     });
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'You are not authorized to access this information' });
+      return res.status(401).send({ message: 'No está autorizado a acceder a esta información' });
     }
-    return res.status(200).send({ message: 'Pets successfully found', pets: familyGroup.pets });
+    return res
+      .status(200)
+      .send({ message: 'Mascotas encontradas con éxito', pets: familyGroup.pets });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -73,21 +75,21 @@ const updatePet = async (req, res) => {
   } = req;
   try {
     const foundPet = await Pet.findById(pet.id).populate('familyGroup');
-    if (!foundPet) return res.status(400).send({ message: 'Pet not found' });
+    if (!foundPet) return res.status(400).send({ message: 'Mascota no encontrada' });
 
     const { familyGroup } = foundPet;
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'You are not authorized to access this information' });
+      return res.status(401).send({ message: 'No está autorizado a acceder a esta información' });
     }
 
-    if (!pet) return res.status(404).send({ message: 'Pet not found' });
+    if (!pet) return res.status(404).send({ message: 'Mascota no encontrada' });
 
     const { name, birthdate } = pet;
     foundPet.name = name;
     foundPet.birthdate = birthdate;
     const savedPet = await foundPet.save();
-    return res.status(200).send({ message: 'Pet successfully updated', pet: savedPet });
+    return res.status(200).send({ message: 'Mascota actualizada con éxito', pet: savedPet });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -101,8 +103,8 @@ const destroyPet = async (req, res) => {
     const pet = await Pet.findByIdAndDelete(petId);
     const familyGroup = await FamilyGroup.findById(pet.familyGroup);
     await familyGroup.removePetById(petId);
-    if (!pet) return res.status(404).send({ message: 'Pet not found' });
-    return res.status(200).send({ message: 'Pet successfully destroyed', pet });
+    if (!pet) return res.status(404).send({ message: 'Mascota no encontrada' });
+    return res.status(200).send({ message: 'Mascota eliminada con éxito', pet });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }

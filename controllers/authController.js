@@ -124,7 +124,7 @@ const signInGoogle = async (req, res) => {
 // ======================================================
 const signUp = async (req, res) => {
   const { error } = registerValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send({ message: error.details[0].message });
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist) return res.status(400).send({ ok: false, err: 'Email ya existe' });
   const user = new User();
@@ -147,7 +147,7 @@ const signIn = async (req, res) => {
   const { body } = req;
   const { error } = loginValidation(body);
 
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send({ message: error.details[0].message });
   const userExist = await User.findOne({ email: body.email });
 
   // ======================================================

@@ -75,7 +75,7 @@ const signInGoogle = async (req, res) => {
 
     return res.status(200).json({
       ok: true,
-      msg: 'Incio de sesion con Google',
+      msg: 'Inicio de sesion con Google',
       user: {
         createAt: userExist.createdAt,
         id: userExist.id,
@@ -156,7 +156,7 @@ const signIn = async (req, res) => {
   if (!userExist || !bcrypt.compareSync(body.password, userExist.password)) {
     return res.status(401).json({
       ok: false,
-      err: `Correo electronico o contraseña incorrecto`
+      err: `Correo electronico o contraseña incorrecta`
     });
   }
 

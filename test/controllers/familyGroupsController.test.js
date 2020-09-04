@@ -110,7 +110,7 @@ describe('Family Group Controller', () => {
         req.body.name = mockedName;
         req.body.timeZoneId = savedTimeZone;
         await createFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('User not found');
+        expect(res._getData().message).toBe('Usuario no encontrado');
       });
     });
     describe('when timezone does not exist', () => {
@@ -120,7 +120,7 @@ describe('Family Group Controller', () => {
         req.body.name = mockedName;
         req.body.timeZoneId = null;
         await createFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('Timezone not found');
+        expect(res._getData().message).toBe('Zona horaria no encontrada');
       });
     });
     describe('when user creates a family group', () => {
@@ -130,7 +130,7 @@ describe('Family Group Controller', () => {
         req.body.name = mockedName;
         req.body.timeZoneId = savedTimeZone;
         await createFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('Family Group created successfully');
+        expect(res._getData().message).toBe('Grupo familiar creado con éxito');
         expect(res._getData().familyGroup).toHaveProperty('id');
         expect(res._getData().familyGroup).toHaveProperty('name', mockedName);
         expect(res._getData().familyGroup).toHaveProperty('users');
@@ -146,7 +146,7 @@ describe('Family Group Controller', () => {
         const mockedName = faker.name.lastName(1);
         req.body = { name: mockedName, users: [savedUser._id], timeZone: savedTimeZone._id };
         await updateFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('Family Group updated successfully');
+        expect(res._getData().message).toBe('Grupo familiar actualizado con éxito');
         expect(res._getData().familyGroup).toHaveProperty('id');
         expect(res._getData().familyGroup).toHaveProperty('name', mockedName);
         expect(res._getData().familyGroup).toHaveProperty('users');
@@ -161,7 +161,7 @@ describe('Family Group Controller', () => {
         req.params.groupId = savedFamilyGroup._id;
         await destroyFamilyGroup(req, res, next);
         expect(res.statusCode).toBe(200);
-        expect(res._getData().message).toBe('Family Group destroyed successfully');
+        expect(res._getData().message).toBe('Grupo familiar eliminado con éxito');
       });
     });
   });

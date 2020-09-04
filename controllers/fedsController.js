@@ -10,13 +10,13 @@ const createFed = async (req, res) => {
 
   try {
     const pet = await Pet.findById(petId);
-    if (!pet) return res.status(404).send({ message: 'Pet not found' });
+    if (!pet) return res.status(404).send({ message: 'Mascota no encontrada' });
 
     const user = await User.findById(userId);
     const fed = await Fed.create({ pet, user });
     pet.feds.push(fed);
     await pet.save();
-    return res.status(201).send({ message: 'Fed added successfully', fed });
+    return res.status(201).send({ message: 'Alimentación agregada con éxito', fed });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -29,8 +29,8 @@ const getFed = async (req, res) => {
 
   try {
     const fed = await Fed.findById(fedId);
-    if (!fed) return res.status(404).send({ message: 'Fed not found' });
-    return res.status(200).send({ message: 'Fed successfully found', fed });
+    if (!fed) return res.status(404).send({ message: 'Alimentación no encontrada' });
+    return res.status(200).send({ message: 'Alimentación encontrada con éxito', fed });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -44,8 +44,8 @@ const destroyFed = async (req, res) => {
     const fed = await Fed.findByIdAndDelete(fedId);
     const pet = await Pet.findById(fed.pet);
     await pet.removeFedById(fedId);
-    if (!pet) return res.status(404).send({ message: 'Fed not found' });
-    return res.status(200).send({ message: 'Fed successfully destroyed', fed });
+    if (!pet) return res.status(404).send({ message: 'Alimentación no encontrada' });
+    return res.status(200).send({ message: 'Alimentación eliminada con éxito', fed });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }

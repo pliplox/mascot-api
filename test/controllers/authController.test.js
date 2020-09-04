@@ -48,7 +48,7 @@ describe('Authentication Controller', () => {
         req.body = mockedUser2;
         authController.signUp(req, res, next);
         // TODO: here this should import the validated errors... or not (?)
-        expect(res._getData()).toBe('"email" must be a valid email');
+        expect(res._getData()).toStrictEqual({ message: '"email" must be a valid email' });
       });
     });
 
@@ -96,7 +96,7 @@ describe('Authentication Controller', () => {
         const mockedUser2 = { email: 'test2test2cla', password: mockedPassword };
         req.body = mockedUser2;
         authController.signIn(req, res, next);
-        expect(res._getData()).toBe('"email" must be a valid email');
+        expect(res._getData()).toStrictEqual({ message: '"email" must be a valid email' });
       });
     });
 

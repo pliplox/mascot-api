@@ -77,7 +77,7 @@ describe('Feds Controller', () => {
     it('returns the created fed', async () => {
       req.body.petId = pet._id;
       await createFed(req, res, next);
-      expect(res._getData().message).toBe('Fed added successfully');
+      expect(res._getData().message).toBe('Alimentación agregada con éxito');
       expect(res.statusCode).toBe(201);
       expect(res._getData().fed).toBeInstanceOf(Fed);
     });
@@ -104,7 +104,7 @@ describe('Feds Controller', () => {
       req.params.fedId = fed._id;
       await getFed(req, res, next);
       expect(res.statusCode).toBe(200);
-      expect(res._getData().message).toBe('Fed successfully found');
+      expect(res._getData().message).toBe('Alimentación encontrada con éxito');
       expect(res._getData().fed).toBeInstanceOf(Fed);
     });
   });
@@ -131,7 +131,7 @@ describe('Feds Controller', () => {
       req.body.fedId = fedToDestroy._id;
       await destroyFed(req, res, next);
       expect(res.statusCode).toBe(200);
-      expect(res._getData().message).toBe('Fed successfully destroyed');
+      expect(res._getData().message).toBe('Alimentación eliminada con éxito');
       expect(res._getData().fed._id).toStrictEqual(fedToDestroy._id);
     });
   });

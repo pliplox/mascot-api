@@ -67,14 +67,15 @@ const userSchema = new Schema({
   ]
 });
 
-// eslint-disable-next-line func-names
-userSchema.pre('save', async function(next) {
-  // eslint-disable-next-line prefer-const
-  let user = this;
-  const hash = await bcrypt.hash(user.password, 10);
-  if (!hash) next(new Error('Error hashing the password'));
-  user.password = hash;
-  next();
+userSchema.pre('save', async function encriptPassword(next) {
+  if (!this.isModified('password')) return next();
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+    return next();
+  } catch (e) {
+    return next(e);
+  }
+  
 });
 
 module.exports = mongoose.model('User', userSchema);

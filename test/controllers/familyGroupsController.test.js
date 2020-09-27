@@ -108,27 +108,16 @@ describe('Family Group Controller', () => {
         req.userId = null;
         const mockedName = faker.name.lastName();
         req.body.name = mockedName;
-        req.body.timeZoneId = savedTimeZone;
         await createFamilyGroup(req, res, next);
         expect(res._getData().message).toBe('Usuario no encontrado');
       });
     });
-    describe('when timezone does not exist', () => {
-      it('returns a not found message', async () => {
-        req.userId = savedUser._id;
-        const mockedName = faker.name.lastName();
-        req.body.name = mockedName;
-        req.body.timeZoneId = null;
-        await createFamilyGroup(req, res, next);
-        expect(res._getData().message).toBe('Zona horaria no encontrada');
-      });
-    });
+
     describe('when user creates a family group', () => {
       it('returns the created family group object', async () => {
         req.userId = savedUser._id;
         const mockedName = faker.name.lastName();
         req.body.name = mockedName;
-        req.body.timeZoneId = savedTimeZone;
         await createFamilyGroup(req, res, next);
         expect(res._getData().message).toBe('Grupo familiar creado con éxito');
         expect(res._getData().familyGroup).toHaveProperty('id');

@@ -20,11 +20,14 @@ describe('Family Group Model', () => {
   });
 
   it('creates and save a Family Group', async () => {
-    const validFamilyGroup = new FamilyGroup({ name: mockName, timeZone: savedTimeZone });
+    const validFamilyGroup = new FamilyGroup({ name: mockName });
     const savedFamilyGroup = await validFamilyGroup.save();
 
     expect(savedFamilyGroup._id).toBeDefined();
     expect(savedFamilyGroup.name).toBe(mockName);
+
+    // adds a default time zone
+    expect(savedFamilyGroup.timeZone).toBeDefined();
   });
 
   it('not defined field in schema is undefined', async () => {

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const TimeZone = require('./TimeZone');
 
 const { Schema } = mongoose;
 
@@ -15,8 +16,7 @@ const familyGroupSchema = new Schema({
   ],
   timeZone: {
     type: Schema.Types.ObjectId,
-    ref: 'TimeZone',
-    required: true
+    ref: 'TimeZone'
   },
   pets: [
     {
@@ -24,6 +24,17 @@ const familyGroupSchema = new Schema({
       ref: 'Pet'
     }
   ]
+});
+
+familyGroupSchema.pre('save', async function defaultTimeZone(next) {
+  // next line serves as guard to avoid running this function when a timeZone is already set
+  if (this.timeZone) return next();
+  try {
+    this.timeZone = await TimeZone.findOne();
+    return next();
+  } catch (e) {
+    return next(e);
+  }
 });
 
 familyGroupSchema.methods.removePetById = async function removePet(petId) {

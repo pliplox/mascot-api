@@ -75,7 +75,6 @@ userSchema.pre('save', async function encriptPassword(next) {
   } catch (e) {
     return next(e);
   }
-  
 });
 
 module.exports = mongoose.model('User', userSchema);

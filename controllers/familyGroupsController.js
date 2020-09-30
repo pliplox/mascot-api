@@ -37,15 +37,13 @@ const getFamilyGroup = async (req, res) => {
 const createFamilyGroup = async (req, res) => {
   const {
     userId,
-    body: { name, timeZoneId }
+    body: { name }
   } = req;
 
   try {
-    const timeZone = await TimeZone.findById(timeZoneId);
-    if (!timeZone) return res.status(404).send({ message: 'Zona horaria no encontrada' });
     const user = await User.findById(userId);
     if (!user) return res.status(404).send({ message: 'Usuario no encontrado' });
-    const familyGroup = new FamilyGroup({ name, timeZone });
+    const familyGroup = new FamilyGroup({ name });
     familyGroup.users.push(user);
     const savedFamilyGroup = await familyGroup.save();
     user.familyGroups.push(savedFamilyGroup);

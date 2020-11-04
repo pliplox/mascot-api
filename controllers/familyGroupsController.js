@@ -26,7 +26,7 @@ const getFamilyGroup = async (req, res) => {
     const familyGroup = await FamilyGroup.findById(groupId);
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'You are not authorized to access this information' });
+      return res.status(401).send({ message: 'No está autorizado a acceder a esta información' });
     }
     return res.status(200).send(familyGroup);
   } catch (error) {
@@ -37,15 +37,13 @@ const getFamilyGroup = async (req, res) => {
 const createFamilyGroup = async (req, res) => {
   const {
     userId,
-    body: { name, timeZoneId }
+    body: { name }
   } = req;
 
   try {
-    const timeZone = await TimeZone.findById(timeZoneId);
-    if (!timeZone) return res.status(404).send({ message: 'Timezone not found' });
     const user = await User.findById(userId);
-    if (!user) return res.status(404).send({ message: 'User not found' });
-    const familyGroup = new FamilyGroup({ name, timeZone });
+    if (!user) return res.status(404).send({ message: 'Usuario no encontrado' });
+    const familyGroup = new FamilyGroup({ name });
     familyGroup.users.push(user);
     const savedFamilyGroup = await familyGroup.save();
     user.familyGroups.push(savedFamilyGroup);
@@ -55,7 +53,7 @@ const createFamilyGroup = async (req, res) => {
       return { id: u._id, name: u.name };
     });
     return res.status(201).send({
-      message: 'Family Group created successfully',
+      message: 'Grupo familiar creado con éxito',
       familyGroup: { id: _id, name, users: usersArray }
     });
   } catch (error) {
@@ -70,14 +68,14 @@ const updateFamilyGroup = async (req, res) => {
     body: incomingFamilyGroup
   } = req;
   if (!incomingFamilyGroup) {
-    return res.status(400).send({ message: 'Empty Family Group' });
+    return res.status(400).send({ message: 'Grupo familiar vacio' });
   }
   try {
     const foundFamilyGroup = await FamilyGroup.findById(groupId);
     const { users } = foundFamilyGroup;
     const findUser = users.find(user => user.toString() === userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'You are not authorized to access this information' });
+      return res.status(401).send({ message: 'No está autorizado a acceder a esta información' });
     }
 
     // when removing all users from family group
@@ -131,7 +129,7 @@ const updateFamilyGroup = async (req, res) => {
     const savedFamilyGroup = await foundFamilyGroup.save();
     return res
       .status(200)
-      .send({ message: 'Family Group updated successfully', familyGroup: savedFamilyGroup });
+      .send({ message: 'Grupo familiar actualizado con éxito', familyGroup: savedFamilyGroup });
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -144,7 +142,7 @@ const destroyFamilyGroup = async (req, res) => {
   try {
     const familyGroup = await FamilyGroup.findById(groupId);
     if (!familyGroup) {
-      return res.status(404).send({ message: 'Family Group not found' });
+      return res.status(404).send({ message: 'Grupo familiar no encontrado' });
     }
     if (familyGroup.users.length >= 1) {
       familyGroup.users.forEach(async userIdObject => {
@@ -157,7 +155,7 @@ const destroyFamilyGroup = async (req, res) => {
       });
     }
     await FamilyGroup.deleteOne(familyGroup);
-    return res.status(200).send({ message: 'Family Group destroyed successfully' });
+    return res.status(200).send({ message: 'Grupo familiar eliminado con éxito' });
   } catch (error) {
     return res.status(500).send(error);
   }

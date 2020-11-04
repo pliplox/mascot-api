@@ -11,7 +11,7 @@ const getUsers = (req, res) => {
       if (err) {
         return res.status(500).json({
           ok: false,
-          msg: 'Could not load user',
+          message: 'No se pudo cargar el usuario',
           errors: err
         });
       }
@@ -20,7 +20,7 @@ const getUsers = (req, res) => {
         if (errCount) {
           return res.status(500).json({
             ok: false,
-            msg: 'Error trying to count users',
+            message: 'Error al contar usuarios',
             errors: errCount
           });
         }
@@ -48,7 +48,7 @@ const updateUser = (req, res) => {
     if (findErr) {
       return res.status(500).json({
         ok: false,
-        msg: 'User search failed ',
+        message: 'Error en la búsqueda del usuario',
         errors: findErr
       });
     }
@@ -56,14 +56,14 @@ const updateUser = (req, res) => {
     if (!userDB) {
       return res.status(400).json({
         ok: false,
-        msg: `The user id: ${id} not found`
+        message: `El usuario con ID: ${id} no encontrado`
       });
     }
 
     if (userDB.loginType !== 'NORMAL') {
       return res.status(400).json({
         ok: false,
-        msg: `account type: ${userDB.loginType} cannot be modified.`
+        message: `El tipo de cuenta: ${userDB.loginType} no se puede modificar`
       });
     }
 
@@ -80,14 +80,14 @@ const updateUser = (req, res) => {
       if (err) {
         return res.status(400).json({
           ok: false,
-          msg: 'Error trying to update user',
+          message: 'Error al intentar actualizar el usuario',
           errors: err
         });
       }
 
       return res.status(200).json({
         ok: true,
-        msg: 'User updated',
+        message: 'Usuario actualizado',
         user: {
           id: userSave.id,
           name: userSave.name,
@@ -119,14 +119,14 @@ const createUser = async (req, res) => {
     if (err) {
       return res.status(400).json({
         ok: false,
-        msg: 'Error trying to create user',
+        message: 'Error al intentar crear un usuario',
         errors: err
       });
     }
 
     return res.status(201).json({
       ok: true,
-      msg: userSave
+      message: userSave
     });
   });
 };
@@ -141,7 +141,7 @@ const deleteUser = async (req, res) => {
     if (err) {
       return res.status(500).json({
         ok: false,
-        msg: 'User search failed ',
+        message: 'Error en la búsqueda del usuario',
         errors: err
       });
     }
@@ -149,13 +149,13 @@ const deleteUser = async (req, res) => {
     if (!userDelete) {
       return res.status(400).json({
         ok: false,
-        msg: `The user id: ${id} not found`
+        message: `El usuario ID: ${id} no encontrado`
       });
     }
 
     return res.status(200).json({
       ok: true,
-      msg: 'User deleted',
+      message: 'Usuario eliminado',
       user: userDelete
     });
   });

@@ -86,7 +86,7 @@ describe('Pets Controller', () => {
       };
       await createPet(req, res, next);
       expect(res.statusCode).toBe(201);
-      expect(res._getData().message).toBe('Pet created successfully');
+      expect(res._getData().message).toBe('Mascota creada con éxito');
       expect(res._getData().pet).toHaveProperty('id');
       expect(res._getData().pet).toHaveProperty('name', petNameMock);
       expect(res._getData().pet).toHaveProperty('birthdate', petBirthdateMock);
@@ -108,7 +108,7 @@ describe('Pets Controller', () => {
       await getPet(req, res, next);
       const responseData = res._getData();
       const { message, pet: responsePet } = responseData;
-      expect(message).toBe('Pet successfully found');
+      expect(message).toBe('Mascota encontrado con éxito');
       expect(responsePet.id).toBe(savedPet._id.toString());
       expect(responsePet).toBeInstanceOf(Pet);
     });
@@ -166,7 +166,7 @@ describe('Pets Controller', () => {
 
     it('returns the updated pet with updated fields ', async () => {
       await updatePet(req, res, next);
-      expect(res._getData().message).toBe('Pet successfully updated');
+      expect(res._getData().message).toBe('Mascota actualizada con éxito');
       expect(res.statusCode).toBe(200);
       expect(res._getData().pet).toHaveProperty('_id', updatingPet._id);
       expect(res._getData().pet).toHaveProperty('birthdate', new Date('2000-01-01T00:00:00'));
@@ -188,7 +188,7 @@ describe('Pets Controller', () => {
       req.body.petId = petToDestroy._id;
       await destroyPet(req, res, next);
       expect(res.statusCode).toBe(200);
-      expect(res._getData().message).toBe('Pet successfully destroyed');
+      expect(res._getData().message).toBe('Mascota eliminada con éxito');
       expect(res._getData().pet._id).toStrictEqual(petToDestroy._id);
     });
   });

@@ -65,7 +65,7 @@ const signInGoogle = async (req, res) => {
   const googleUser = await verify(token).catch(e => {
     return res.status(403).json({
       ok: false,
-      err: `Invalid token: ${e}`
+      message: ` Token no valido: ${e}`
     });
   });
 
@@ -75,7 +75,7 @@ const signInGoogle = async (req, res) => {
 
     return res.status(200).json({
       ok: true,
-      msg: 'Login with google',
+      message: 'Inicio de sesion con Google',
       user: {
         createAt: userExist.createdAt,
         id: userExist.id,
@@ -100,7 +100,7 @@ const signInGoogle = async (req, res) => {
     const jwtoken = jwt.sign({ user: savedUser }, process.env.TOKEN_SECRET, { expiresIn: 900 }); // 15 minutes...
     return res.status(200).send({
       ok: true,
-      msg: 'User saved in DB',
+      message: 'Usuario guardado',
       user: {
         createAt: savedUser.createdAt,
         id: savedUser.id,
@@ -114,7 +114,7 @@ const signInGoogle = async (req, res) => {
   } catch (saveErr) {
     return res.status(400).json({
       ok: false,
-      err: saveErr
+      message: saveErr
     });
   }
 };
@@ -124,9 +124,9 @@ const signInGoogle = async (req, res) => {
 // ======================================================
 const signUp = async (req, res) => {
   const { error } = registerValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send({ message: error.details[0].message });
   const emailExist = await User.findOne({ email: req.body.email });
-  if (emailExist) return res.status(400).send({ ok: false, err: 'Email already exists' });
+  if (emailExist) return res.status(400).send({ ok: false, message: 'Email ya existe' });
   const user = new User();
   user.name = req.body.name;
   user.email = req.body.email;
@@ -134,7 +134,7 @@ const signUp = async (req, res) => {
 
   try {
     const savedUser = await user.save();
-    return res.status(201).send({ message: 'User created successfully', userId: savedUser._id });
+    return res.status(201).send({ message: 'Usuario creado con éxito', userId: savedUser._id });
   } catch (err) {
     return res.status(400).send(err);
   }
@@ -147,7 +147,7 @@ const signIn = async (req, res) => {
   const { body } = req;
   const { error } = loginValidation(body);
 
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send({ message: error.details[0].message });
   const userExist = await User.findOne({ email: body.email });
 
   // ======================================================
@@ -156,7 +156,7 @@ const signIn = async (req, res) => {
   if (!userExist || !bcrypt.compareSync(body.password, userExist.password)) {
     return res.status(401).json({
       ok: false,
-      err: `The email or password is not correct`
+      message: `Correo electronico o contraseña incorrecta`
     });
   }
 

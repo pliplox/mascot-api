@@ -5,6 +5,7 @@ const FamilyGroup = require('../../models/FamilyGroup');
 const TimeZone = require('../../models/TimeZone');
 const authController = require('../../controllers/authController');
 const User = require('../../models/User');
+const Pet = require('../../models/Pet');
 
 const databaseHandler = require('../helpers/databaseHandler');
 
@@ -81,12 +82,36 @@ describe('Family Group Controller', () => {
       foundUser.familyGroups.push(createdFamilyGroup);
       await foundUser.save();
 
+      // Create Pet and add to group
+      const pet = await Pet.create({
+        name: 'Renata',
+        birthdate: '2020-04-05',
+        familyGroup: createdFamilyGroup
+      });
+
+      createdFamilyGroup.pets.push(pet);
+      await createdFamilyGroup.save();
+
+      const groupUsers = [
+        { _id: savedUser._id, name: savedUser.name },
+        { _id: foundUser._id, name: foundUser.name }
+      ];
+
       // Test the controller request by authenticated user
       await getFamilyGroups(req, res, next);
-      expect(res._getData().length).toBeGreaterThan(0);
-      expect(res._getData()).toEqual(
-        expect.arrayContaining([{ id: createdFamilyGroup._id, name: createdFamilyGroup.name }])
-      );
+
+      const data = res._getData();
+      const responseGroup = JSON.stringify(data.groups);
+      const expectedGroup = JSON.stringify([
+        {
+          id: createdFamilyGroup._id,
+          name: createdFamilyGroup.name,
+          users: groupUsers,
+          pets: [{ _id: pet._id, name: pet.name }]
+        }
+      ]);
+
+      expect(responseGroup).toBe(expectedGroup);
     });
   });
 

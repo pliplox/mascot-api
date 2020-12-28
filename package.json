@@ -14,7 +14,8 @@
     "server:production": "cross-env API_ENV=production nodemon index.js",
     "repl:local": "cross-env API_ENV=local NODE_OPTIONS=--experimental-repl-await node repl.js",
     "repl:staging": "cross-env API_ENV=staging NODE_OPTIONS=--experimental-repl-await node repl.js",
-    "repl:production": "cross-env API_ENV=production NODE_OPTIONS=--experimental-repl-await node repl.js"
+    "repl:production": "cross-env API_ENV=production NODE_OPTIONS=--experimental-repl-await node repl.js",
+    "audit:fix": "npx yarn-audit-fix --package-lock-only"
   },
   "repository": {
     "type": "git",

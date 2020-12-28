@@ -6,12 +6,19 @@ const { findUserInFamilyGroup } = require('../utils/sharedFunctions');
 const getFamilyGroups = async (req, res) => {
   const { userId } = req;
   try {
-    const user = await User.findById(userId).populate('familyGroups');
-    const { familyGroups } = user;
-    const familyGroupsArray = familyGroups.map(familyGroup => {
-      return { id: familyGroup._id, name: familyGroup.name };
+    const user = await User.findById(userId).populate({
+      path: 'familyGroups',
+      populate: { path: 'users pets', select: 'name' }
     });
-    res.status(200).send(familyGroupsArray);
+    const { familyGroups } = user;
+    const groups = familyGroups.map(({ id, name, users, pets }) => ({
+      id,
+      name,
+      users,
+      pets
+    }));
+
+    res.status(200).send({ groups });
   } catch (error) {
     res.status(500).send(error);
   }

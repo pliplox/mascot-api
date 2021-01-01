@@ -6,8 +6,8 @@ mongoose.set('useCreateIndex', true);
 const { Schema } = mongoose;
 
 const validRoleEnum = {
-  values: ['ADMIN_ROLE', 'USER_ROLE'], //  *** If necessary you can add more roles ***
-  message: '{VALUE} it isn´t an allowed role'
+  values: ['ADMIN', 'USER'], //  *** If necessary you can add more roles ***
+  message: "{VALUE} it isn't an allowed role"
 };
 
 const loginTypeEnum = {
@@ -50,7 +50,7 @@ const userSchema = new Schema({
   role: {
     type: String,
     required: true,
-    default: 'USER_ROLE',
+    default: 'USER',
     enum: validRoleEnum
   },
   loginType: {

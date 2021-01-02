@@ -163,7 +163,10 @@ const destroyFamilyGroup = async (req, res) => {
 
     const currentUser = await User.findById(userId);
 
-    if (familyGroup.groupAdmin === currentUser.id || currentUser?.role === ROLES.ADMIN) {
+    // check if current user is group admin
+    const groupAdmin = familyGroup.groupAdmins.find(admin => admin.toString() === userId);
+
+    if (groupAdmin || currentUser?.role === ROLES.ADMIN) {
       if (familyGroup.users.length >= 1) {
         familyGroup.users.forEach(async userIdObject => {
           const u = await User.findById(userIdObject);

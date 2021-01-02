@@ -108,7 +108,7 @@ describe('Pets Controller', () => {
       await getPet(req, res, next);
       const responseData = res._getData();
       const { message, pet: responsePet } = responseData;
-      expect(message).toBe('Mascota encontrado con éxito');
+      expect(message).toBe('Mascota encontrada con éxito');
       expect(responsePet.id).toBe(savedPet._id.toString());
       expect(responsePet).toBeInstanceOf(Pet);
     });

@@ -4,7 +4,7 @@ const petsController = require('../../controllers/petsController');
 const authController = require('../../controllers/authController');
 const TimeZone = require('../../models/TimeZone');
 const FamilyGroup = require('../../models/FamilyGroup');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 const Pet = require('../../models/Pet');
 require('../../models/Fed'); // to be called when getAllPets is called
 

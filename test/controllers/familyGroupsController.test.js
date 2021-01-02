@@ -4,7 +4,7 @@ const familyGroupsController = require('../../controllers/familyGroupsController
 const FamilyGroup = require('../../models/FamilyGroup');
 const TimeZone = require('../../models/TimeZone');
 const authController = require('../../controllers/authController');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 const Pet = require('../../models/Pet');
 
 const databaseHandler = require('../helpers/databaseHandler');

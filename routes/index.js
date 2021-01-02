@@ -5,6 +5,9 @@ const familyGroupsController = require('../controllers/familyGroupsController');
 const petsController = require('../controllers/petsController');
 const fedsController = require('../controllers/fedsController');
 const { authUser, authRole } = require('../middlewares/authentication');
+const { ROLES } = require('../models/User');
+
+const { ADMIN } = ROLES;
 
 const api = express.Router();
 
@@ -15,9 +18,9 @@ api.post('/signingoogle', authController.signInGoogle);
 // api.get('/signingithub', authController.signInGitHub); // TODO: StandBy
 
 // Users
-api.get('/getusers', authUser, authRole('ADMIN'), usersController.getUsers);
+api.get('/getusers', authUser, authRole(ADMIN), usersController.getUsers);
 api.put('/updateuser/:id', authUser, usersController.updateUser);
-api.post('/createuser', authUser, usersController.createUser);
+api.post('/createuser', authUser, authRole(ADMIN), usersController.createUser);
 api.delete('/deleteuser/:id', authUser, usersController.deleteUser);
 
 // Family Group
@@ -25,6 +28,7 @@ api.post('/family/group', authUser, familyGroupsController.createFamilyGroup);
 api.get('/family/groups', authUser, familyGroupsController.getFamilyGroups);
 api.get('/family/groups/:groupId', authUser, familyGroupsController.getFamilyGroup);
 api.put('/family/groups/:groupId', authUser, familyGroupsController.updateFamilyGroup);
+
 api.delete('/family/groups/:groupId', authUser, familyGroupsController.destroyFamilyGroup);
 
 // Pet

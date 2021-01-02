@@ -1,5 +1,5 @@
 const FamilyGroup = require('../models/FamilyGroup');
-const User = require('../models/User');
+const { User, ROLES } = require('../models/User');
 const TimeZone = require('../models/TimeZone');
 const { findUserInFamilyGroup } = require('../utils/sharedFunctions');
 
@@ -33,7 +33,7 @@ const getFamilyGroup = async (req, res) => {
     const familyGroup = await FamilyGroup.findById(groupId);
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
-      return res.status(401).send({ message: 'No está autorizado a acceder a esta información' });
+      return res.status(401).send({ message: 'No estás autorizado a acceder a esta información' });
     }
     return res.status(200).send(familyGroup);
   } catch (error) {
@@ -51,6 +51,7 @@ const createFamilyGroup = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).send({ message: 'Usuario no encontrado' });
     const familyGroup = new FamilyGroup({ name });
+    familyGroup.groupAdmins.push(user);
     familyGroup.users.push(user);
     const savedFamilyGroup = await familyGroup.save();
     user.familyGroups.push(savedFamilyGroup);
@@ -143,26 +144,39 @@ const updateFamilyGroup = async (req, res) => {
 };
 
 const destroyFamilyGroup = async (req, res) => {
+  const unauthorizedActionMessage = 'No estás autorizado para realizar esta acción';
   const {
-    params: { groupId }
+    params: { groupId },
+    userId
   } = req;
+
   try {
     const familyGroup = await FamilyGroup.findById(groupId);
     if (!familyGroup) {
       return res.status(404).send({ message: 'Grupo familiar no encontrado' });
     }
-    if (familyGroup.users.length >= 1) {
-      familyGroup.users.forEach(async userIdObject => {
-        const u = await User.findById(userIdObject);
-        const filteredFamilyGroups = u.familyGroups.filter(
-          familyGroupObjectId => familyGroupObjectId.toString() !== groupId
-        );
-        u.familyGroups = filteredFamilyGroups;
-        await u.save();
-      });
+
+    const findUser = findUserInFamilyGroup(familyGroup, userId);
+    if(!findUser) { return res.status(401).send({ message: unauthorizedActionMessage }) }
+
+    const currentUser = await User.findById(userId)
+ 
+    if (familyGroup.groupAdmin == currentUser.id || currentUser?.role === ROLES.ADMIN) {
+      if (familyGroup.users.length >= 1) {
+        familyGroup.users.forEach(async userIdObject => {
+          const u = await User.findById(userIdObject);
+          const filteredFamilyGroups = u.familyGroups.filter(
+            familyGroupObjectId => familyGroupObjectId.toString() !== groupId
+          );
+          u.familyGroups = filteredFamilyGroups;
+          await u.save();
+        });
+      }
+      await FamilyGroup.deleteOne(familyGroup);
+      return res.status(200).send({ message: 'Grupo familiar eliminado con éxito' });
+    } else {
+      return res.status(401).send({ message: unauthorizedActionMessage });
     }
-    await FamilyGroup.deleteOne(familyGroup);
-    return res.status(200).send({ message: 'Grupo familiar eliminado con éxito' });
   } catch (error) {
     return res.status(500).send(error);
   }

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { User } = require('../models/User');
+const { canViewUser } = require('../permissions/users');
 
 // ======================================================
 // Token verification
@@ -27,5 +28,10 @@ const authRole = role => async (req, res, next) => {
 
   return next();
 };
+
+const authGetUSer = async (req, res, next) => {
+  const user = await User.findById(req.userId);
+  if(!canViewUser(req))
+}
 
 module.exports = { authUser, authRole };

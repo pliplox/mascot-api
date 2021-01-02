@@ -1,6 +1,6 @@
 const Fed = require('../models/Fed');
 const Pet = require('../models/Pet');
-const User = require('../models/User');
+const { User } = require('../models/User');
 
 const createFed = async (req, res) => {
   const {

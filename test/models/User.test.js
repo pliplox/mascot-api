@@ -2,7 +2,7 @@ const faker = require('faker');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const databaseHandler = require('../helpers/databaseHandler');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 
 describe('User model', () => {
   beforeAll(async () => databaseHandler.openConnection());

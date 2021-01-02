@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const { User, ROLES } = require('../models/User');
 
 // ======================================================
 // Get all users FIXME: This method should change the structure or whatever
@@ -135,30 +135,39 @@ const createUser = async (req, res) => {
 // Delete user
 // ======================================================
 const deleteUser = async (req, res) => {
-  const { id } = req.params;
+  const {
+    params: { id },
+    userId
+  } = req;
 
-  await User.findByIdAndDelete(id, (err, userDelete) => {
-    if (err) {
-      return res.status(500).json({
-        ok: false,
-        message: 'Error en la búsqueda del usuario',
-        errors: err
+  if (id === userId) {
+    await User.findByIdAndDelete(id, (err, userDelete) => {
+      if (err) {
+        return res.status(500).send({
+          ok: false,
+          message: 'Error en la búsqueda del usuario',
+          errors: err
+        });
+      }
+
+      if (!userDelete) {
+        return res.status(404).send({
+          ok: false,
+          message: `El usuario ID: ${id} no encontrado`
+        });
+      }
+
+      return res.status(200).send({
+        ok: true,
+        message: 'Usuario eliminado',
+        user: userDelete
       });
-    }
-
-    if (!userDelete) {
-      return res.status(400).json({
-        ok: false,
-        message: `El usuario ID: ${id} no encontrado`
-      });
-    }
-
-    return res.status(200).json({
-      ok: true,
-      message: 'Usuario eliminado',
-      user: userDelete
     });
-  });
+  } else {
+    return res.status(401).send({
+      message: 'No estás autorizado para eliminar a este usuario'
+    });
+  }
 };
 
 module.exports = {

@@ -134,6 +134,7 @@ const createUser = async (req, res) => {
 // ======================================================
 // Delete user
 // ======================================================
+// eslint-disable-next-line consistent-return
 const deleteUser = async (req, res) => {
   const {
     params: { id },

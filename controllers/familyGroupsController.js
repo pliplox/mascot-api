@@ -157,10 +157,12 @@ const destroyFamilyGroup = async (req, res) => {
     }
 
     const findUser = findUserInFamilyGroup(familyGroup, userId);
-    if(!findUser) { return res.status(401).send({ message: unauthorizedActionMessage }) }
+    if (!findUser) {
+      return res.status(401).send({ message: unauthorizedActionMessage });
+    }
 
-    const currentUser = await User.findById(userId)
- 
+    const currentUser = await User.findById(userId);
+
     if (familyGroup.groupAdmin == currentUser.id || currentUser?.role === ROLES.ADMIN) {
       if (familyGroup.users.length >= 1) {
         familyGroup.users.forEach(async userIdObject => {
@@ -174,9 +176,8 @@ const destroyFamilyGroup = async (req, res) => {
       }
       await FamilyGroup.deleteOne(familyGroup);
       return res.status(200).send({ message: 'Grupo familiar eliminado con éxito' });
-    } else {
-      return res.status(401).send({ message: unauthorizedActionMessage });
     }
+    return res.status(401).send({ message: unauthorizedActionMessage });
   } catch (error) {
     return res.status(500).send(error);
   }

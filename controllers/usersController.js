@@ -1,4 +1,4 @@
-const { User, ROLES } = require('../models/User');
+const { User } = require('../models/User');
 
 // ======================================================
 // Get all users FIXME: This method should change the structure or whatever
@@ -9,7 +9,7 @@ const getUsers = (req, res) => {
     'name email createdAt lastLogin birthdate avatarUrl role loginType',
     (err, users) => {
       if (err) {
-        return res.status(500).json({
+        return res.status(500).send({
           ok: false,
           message: 'No se pudo cargar el usuario',
           errors: err
@@ -18,14 +18,14 @@ const getUsers = (req, res) => {
 
       User.countDocuments({}, (errCount, size) => {
         if (errCount) {
-          return res.status(500).json({
+          return res.status(500).send({
             ok: false,
             message: 'Error al contar usuarios',
             errors: errCount
           });
         }
 
-        return res.status(200).json({
+        return res.status(200).send({
           ok: true,
           total: size,
           users

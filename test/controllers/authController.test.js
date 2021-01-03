@@ -1,7 +1,7 @@
 const httpMocks = require('node-mocks-http');
 const faker = require('faker');
 const authController = require('../../controllers/authController');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 const databaseHandler = require('../helpers/databaseHandler');
 
 let req;

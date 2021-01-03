@@ -4,7 +4,7 @@ const petsController = require('../../controllers/petsController');
 const authController = require('../../controllers/authController');
 const TimeZone = require('../../models/TimeZone');
 const FamilyGroup = require('../../models/FamilyGroup');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 const Pet = require('../../models/Pet');
 require('../../models/Fed'); // to be called when getAllPets is called
 
@@ -108,7 +108,7 @@ describe('Pets Controller', () => {
       await getPet(req, res, next);
       const responseData = res._getData();
       const { message, pet: responsePet } = responseData;
-      expect(message).toBe('Mascota encontrado con éxito');
+      expect(message).toBe('Mascota encontrada con éxito');
       expect(responsePet.id).toBe(savedPet._id.toString());
       expect(responsePet).toBeInstanceOf(Pet);
     });

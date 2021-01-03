@@ -6,7 +6,7 @@ const { registerValidation, loginValidation } = require('../validation');
 
 const cid = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(cid);
-const User = require('../models/User');
+const { User } = require('../models/User');
 
 // seconds to expire token in normal signIn function (4 hours)
 const SIGN_IN_TIME_OUT = 14400;

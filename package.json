@@ -4,7 +4,7 @@
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production node --exec babel-node index.js",
+    "start": "NODE_ENV=production node index.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch --runInBand",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",

@@ -5,7 +5,7 @@ const Pet = require('../../models/Pet');
 const FamilyGroup = require('../../models/FamilyGroup');
 const TimeZone = require('../../models/TimeZone');
 const Fed = require('../../models/Fed');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 
 const timeZoneMock = { name: 'Africa/Nairobi', offset: 10 };
 const familyGroupMock = { name: faker.internet.userName() };

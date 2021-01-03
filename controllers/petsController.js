@@ -34,7 +34,7 @@ const getPet = async (req, res) => {
   try {
     const pet = await Pet.findById(petId);
     if (!pet) return res.status(404).send({ message: 'Mascota no excontrada' });
-    return res.status(200).send({ message: 'Mascota encontrado con éxito', pet });
+    return res.status(200).send({ message: 'Mascota encontrada con éxito', pet });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }

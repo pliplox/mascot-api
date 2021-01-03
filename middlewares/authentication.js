@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
+const { User } = require('../models/User');
 
 // ======================================================
 // Token verification
 // ======================================================
-module.exports = (req, res, next) => {
+const authUser = (req, res, next) => {
   const token = req.get('Authorization');
   if (!token) {
     return res.status(401).send('Unauthorized');
@@ -16,3 +17,15 @@ module.exports = (req, res, next) => {
     return res.status(400).send(error);
   }
 };
+
+const authRole = role => async (req, res, next) => {
+  const user = await User.findById(req.userId);
+  if (user.role !== role) {
+    res.status(401);
+    return res.send("You don't have sufficients permissions to access this");
+  }
+
+  return next();
+};
+
+module.exports = { authUser, authRole };

@@ -4,7 +4,7 @@ const familyGroupsController = require('../../controllers/familyGroupsController
 const FamilyGroup = require('../../models/FamilyGroup');
 const TimeZone = require('../../models/TimeZone');
 const authController = require('../../controllers/authController');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 const Pet = require('../../models/Pet');
 
 const databaseHandler = require('../helpers/databaseHandler');
@@ -55,6 +55,9 @@ describe('Family Group Controller', () => {
     // familyGroup
     familyGroup = new FamilyGroup({ name: faker.name.lastName(), timeZone: savedTimeZone });
     user = new User(mockedUser);
+
+    // set user as group admin
+    familyGroup.groupAdmins.push(user);
 
     user.familyGroups.push(familyGroup);
     familyGroup.users.push(user);
@@ -168,14 +171,53 @@ describe('Family Group Controller', () => {
     });
   });
 
-  // TODO: re-do this test
-  describe.skip('destroyFamilyGroup', () => {
-    describe('when user destroy a family group', () => {
+  describe('destroyFamilyGroup', () => {
+    describe('When group admin destroys a family group', () => {
       it('returns a successful destroyed message', async () => {
+        req.userId = savedUser._id.toString();
         req.params.groupId = savedFamilyGroup._id;
         await destroyFamilyGroup(req, res, next);
         expect(res.statusCode).toBe(200);
         expect(res._getData().message).toBe('Grupo familiar eliminado con éxito');
+      });
+    });
+
+    describe('When admin role destroys family group', () => {
+      it('returns a successful destroyed message', async () => {
+        const adminUser = new User({
+          name: 'adminUser',
+          email: 'admin@mail.cl',
+          password: '123123',
+          role: 'ADMIN'
+        });
+        savedFamilyGroup.users.push(adminUser);
+        adminUser.familyGroups.push(savedFamilyGroup);
+
+        await savedFamilyGroup.save();
+        await adminUser.save();
+
+        req.userId = adminUser._id.toString();
+        req.params.groupId = savedFamilyGroup._id;
+
+        await destroyFamilyGroup(req, res, next);
+        expect(res.statusCode).toBe(200);
+        expect(res._getData().message).toBe('Grupo familiar eliminado con éxito');
+      });
+    });
+
+    describe('When basic user outside family group destroys family group', () => {
+      it('returns an unathorized message', async () => {
+        const basicUser = await User.create({
+          name: 'basic user',
+          email: 'basic@mail.com',
+          password: 'basicpass'
+        });
+        req.userId = basicUser.id;
+        req.params.groupId = savedFamilyGroup._id;
+
+        await destroyFamilyGroup(req, res, next);
+        expect(res.statusCode).toBe(401);
+        expect(res._getData().message).toBe('No estás autorizado para realizar esta acción');
       });
     });
   });

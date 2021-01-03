@@ -3,6 +3,9 @@
   "version": "1.0.0-alpha.8",
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
+  "engines": {
+    "node": "15.x"
+  },
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "test": "jest --runInBand",

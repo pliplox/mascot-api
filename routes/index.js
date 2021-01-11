@@ -32,12 +32,21 @@ api.put('/family/groups/:groupId', authUser, familyGroupsController.updateFamily
 api.delete('/family/groups/:groupId', authUser, familyGroupsController.destroyFamilyGroup);
 
 // Pet
-const { createPet, getPet, getAllPets, updatePet, destroyPet } = petsController;
+const {
+  createPet,
+  getPet,
+  getAllPetsByGroupId,
+  updatePet,
+  destroyPet,
+  getAllPetsByUser
+} = petsController;
+
 api.post('/pet', authUser, createPet);
 api.get('/pet/:petId', authUser, getPet);
-api.get('/pets/:familyGroupId', authUser, getAllPets);
+api.get('/pets/:familyGroupId', authUser, getAllPetsByGroupId);
 api.put('/pet', authUser, updatePet);
 api.delete('/pet', authUser, destroyPet);
+api.get('/pets', authUser, getAllPetsByUser);
 
 // Fed
 const { createFed, getFed, destroyFed } = fedsController;

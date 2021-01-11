@@ -5,7 +5,9 @@ filter:
       - develop
 jobs:
   test:
-    executor: node/default
+    executor:
+      name: node/default
+      tag: '15.5.1'
     steps:
       - checkout
       - node/install-packages:
@@ -16,7 +18,7 @@ jobs:
           command: yarn test
           name: Run YARN tests
 orbs:
-  node: 'circleci/node@3.0.1'
+  node: 'circleci/node@4.0.1'
 version: 2.1
 workflows:
   tests:

@@ -6,7 +6,7 @@ filter:
 jobs:
   test:
     parameters:
-      version: 15.x
+      version: 15.5.1
     executor: node/default
     steps:
       - checkout

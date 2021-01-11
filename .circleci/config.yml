@@ -5,9 +5,9 @@ filter:
       - develop
 jobs:
   test:
-    parameters:
-      version: 15.5.1
-    executor: node/default
+    executor:
+      name: node/default
+      tag: '15.5.1'
     steps:
       - checkout
       - node/install-packages:

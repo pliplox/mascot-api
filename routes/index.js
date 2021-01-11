@@ -46,7 +46,7 @@ api.get('/pet/:petId', authUser, getPet);
 api.get('/pets/:familyGroupId', authUser, getAllPetsByGroupId);
 api.put('/pet', authUser, updatePet);
 api.delete('/pet', authUser, destroyPet);
-api.get('/pet', authUser, getAllPetsByUser);
+api.get('/pets', authUser, getAllPetsByUser);
 
 // Fed
 const { createFed, getFed, destroyFed } = fedsController;

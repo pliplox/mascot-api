@@ -43,6 +43,38 @@ const SIGN_IN_TIME_OUT = 14400;
 }; */
 
 // ======================================================
+// Facebook Authentication
+// ======================================================
+const signToken = user => {
+  return jwt.sign(
+    {
+      iss: 'CodeWorkr',
+      sub: user.id,
+      iat: new Date().getTime(), // current time
+      exp: new Date().setDate(new Date().getDate() + 1) // current time + 1 day ahead
+    },
+    process.env.TOKEN_SECRET
+  );
+};
+
+const linkFacebook = async (req, res, next) => {
+  res.json({
+    success: true,
+    methods: req.user.methods,
+    message: 'Successfully linked account with Facebook'
+  });
+};
+
+const facebookOAuth = async (req, res, next) => {
+  // Generate token
+  console.log('hola');
+  const token = signToken(req.user);
+  res.cookie('access_token', token, {
+    httpOnly: true
+  });
+  res.status(200).json({ success: true });
+};
+// ======================================================
 // Google Authentication
 // ======================================================
 const verify = async token => {
@@ -179,5 +211,7 @@ const signIn = async (req, res) => {
 module.exports = {
   signUp,
   signIn,
-  signInGoogle
+  signInGoogle,
+  facebookOAuth,
+  linkFacebook
 };

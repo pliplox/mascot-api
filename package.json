@@ -43,6 +43,8 @@
     "luxon": "^1.21.3",
     "mongodb-memory-server": "^6.6.3",
     "mongoose": "^5.7.4",
+    "passport": "^0.4.1",
+    "passport-facebook-token": "^4.0.0",
     "superagent": "^5.1.0"
   },
   "devDependencies": {

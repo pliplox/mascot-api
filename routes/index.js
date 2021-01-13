@@ -1,4 +1,7 @@
 const express = require('express');
+const passport = require('passport');
+const passportConf = require('../passport');
+const passportJWT = passport.authenticate('jwt', { session: false });
 const usersController = require('../controllers/usersController');
 const authController = require('../controllers/authController');
 const familyGroupsController = require('../controllers/familyGroupsController');
@@ -15,10 +18,21 @@ const api = express.Router();
 api.post('/signup', authController.signUp);
 api.post('/signin', authController.signIn);
 api.post('/signingoogle', authController.signInGoogle);
+api.post(
+  '/oauth/facebook',
+  passport.authenticate('facebookToken', { session: false }),
+  authController.facebookOAuth
+);
+api.post(
+  '/oauth/link/facebook',
+  passportJWT,
+  passport.authorize('facebookToken', { session: false }),
+  authController.linkFacebook
+);
 // api.get('/signingithub', authController.signInGitHub); // TODO: StandBy
 
 // Users
-api.get('/getusers', authUser, authRole(ADMIN), usersController.getUsers);
+api.get('/getusers', authUser, usersController.getUsers);
 api.put('/updateuser/:id', authUser, usersController.updateUser);
 api.post('/createuser', authUser, authRole(ADMIN), usersController.createUser);
 api.delete('/deleteuser/:id', authUser, usersController.deleteUser);

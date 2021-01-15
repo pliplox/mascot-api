@@ -13,7 +13,7 @@ const validRoleEnum = {
 };
 
 const loginTypeEnum = {
-  values: ['NORMAL', 'GOOGLE'],
+  values: ['NORMAL', 'GOOGLE', 'FACEBOOK'],
   message: '{VALUE} it isn´t an allowed role'
 };
 

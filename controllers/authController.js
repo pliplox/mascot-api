@@ -8,72 +8,70 @@ const cid = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(cid);
 const { User } = require('../models/User');
 
-// seconds to expire token in normal signIn function (4 hours)
+// seconds to expire token(4 hours)
 const SIGN_IN_TIME_OUT = 14400;
-
-// ======================================================
-// GitHub Authentication TODO: stand by
-// ======================================================
-/* const request = require('superagent');
-  const cicularJSON = require('circular-json');
-  const signInGitHub = (req, res) => {
-  const code = 'dbea628f1f05a165a7cc';
-  if (!code) {
-    return res.send({
-      ok: false,
-      err: 'Error: no code'
-    });
-  }
-
-  const clientId = 'cc029f3d6736663ed8eb';
-  const clientSecret = 'a8ba44fbf04cc077909ef753dd9037e01512239c';
-
-  request
-    .post('https://github.com/login/oauth/access_token')
-    .send({ client_id: clientId, client_secret: clientSecret, code: code })
-    // .set('X-API-Key', 'foobar')
-    .set('Accept', 'application/json')
-    .then(resp => {
-      return res.send({
-        resultado: JSON.stringify(resp.body),
-        type: typeof resp.body,
-        resultado2: JSON.parse(JSON.stringify(resp.body))
-      });
-    });
-}; */
 
 // ======================================================
 // Facebook Authentication
 // ======================================================
-const signToken = user => {
-  return jwt.sign(
-    {
-      iss: 'CodeWorkr',
-      sub: user.id,
-      iat: new Date().getTime(), // current time
-      exp: new Date().setDate(new Date().getDate() + 1) // current time + 1 day ahead
-    },
-    process.env.TOKEN_SECRET
-  );
+const signInFacebook = async (req, res) => {
+  const { user } = req;
+
+  const userExist = await User.findOne({ email: user.emails[0].value });
+  if (userExist) {
+    const jwtoken = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, {
+      expiresIn: SIGN_IN_TIME_OUT
+    }); //  4 hours...
+    return res.status(200).send({
+      ok: true,
+      message: 'Inicio de sesion con Facebook',
+      user: {
+        createAt: userExist.createdAt,
+        id: userExist.id,
+        name: userExist.name,
+        email: userExist.email,
+        avatarUrl: userExist.avatarUrl,
+        loginType: userExist.loginType
+      },
+      token: { jwtoken }
+    });
+  }
+
+  const userFacebook = new User({
+    name: `${user.name.familyName} ${user.name.givenName}`,
+    email: user.emails[0].value,
+    avatarUrl: user.photos[0].value,
+    loginType: 'FACEBOOK',
+    password: 'SECRET' // plain passwords are never saved in pliplox db
+  });
+
+  try {
+    const savedUser = await userFacebook.save();
+    const jwtoken = jwt.sign({ user: savedUser }, process.env.TOKEN_SECRET, {
+      expiresIn: SIGN_IN_TIME_OUT
+    }); //  4 hours...
+
+    return res.status(200).send({
+      ok: true,
+      message: 'Usuario guardado',
+      user: {
+        createAt: savedUser.createdAt,
+        id: savedUser.id,
+        name: savedUser.name,
+        email: savedUser.email,
+        avatarUrl: savedUser.avatarUrl,
+        loginType: savedUser.loginType
+      },
+      token: { jwtoken }
+    });
+  } catch (saveErr) {
+    return res.status(400).json({
+      ok: false,
+      message: saveErr
+    });
+  }
 };
 
-const linkFacebook = async (req, res, next) => {
-  res.json({
-    success: true,
-    methods: req.user.methods,
-    message: 'Successfully linked account with Facebook'
-  });
-};
-
-const facebookOAuth = async (req, res, next) => {
-  // Generate token
-  console.log('hola');
-  const token = signToken(req.user);
-  res.cookie('access_token', token, {
-    httpOnly: true
-  });
-  res.status(200).json({ success: true });
-};
 // ======================================================
 // Google Authentication
 // ======================================================
@@ -103,7 +101,9 @@ const signInGoogle = async (req, res) => {
 
   const userExist = await User.findOne({ email: googleUser.email });
   if (userExist) {
-    const jwtoken = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, { expiresIn: 900 }); //  15 minutes...
+    const jwtoken = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, {
+      expiresIn: SIGN_IN_TIME_OUT
+    }); // 4 hours...
 
     return res.status(200).json({
       ok: true,
@@ -129,7 +129,9 @@ const signInGoogle = async (req, res) => {
 
   try {
     const savedUser = await userGoogle.save();
-    const jwtoken = jwt.sign({ user: savedUser }, process.env.TOKEN_SECRET, { expiresIn: 900 }); // 15 minutes...
+    const jwtoken = jwt.sign({ user: savedUser }, process.env.TOKEN_SECRET, {
+      expiresIn: SIGN_IN_TIME_OUT
+    }); // 4 hours...
     return res.status(200).send({
       ok: true,
       message: 'Usuario guardado',
@@ -212,6 +214,5 @@ module.exports = {
   signUp,
   signIn,
   signInGoogle,
-  facebookOAuth,
-  linkFacebook
+  signInFacebook
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
+// eslint-disable-next-line no-unused-vars
 const passportConf = require('../passport');
-const passportJWT = passport.authenticate('jwt', { session: false });
 const usersController = require('../controllers/usersController');
 const authController = require('../controllers/authController');
 const familyGroupsController = require('../controllers/familyGroupsController');
@@ -19,17 +19,10 @@ api.post('/signup', authController.signUp);
 api.post('/signin', authController.signIn);
 api.post('/signingoogle', authController.signInGoogle);
 api.post(
-  '/oauth/facebook',
+  '/siginfacebook',
   passport.authenticate('facebookToken', { session: false }),
-  authController.facebookOAuth
+  authController.signInFacebook
 );
-api.post(
-  '/oauth/link/facebook',
-  passportJWT,
-  passport.authorize('facebookToken', { session: false }),
-  authController.linkFacebook
-);
-// api.get('/signingithub', authController.signInGitHub); // TODO: StandBy
 
 // Users
 api.get('/getusers', authUser, usersController.getUsers);

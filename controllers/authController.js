@@ -16,7 +16,6 @@ const SIGN_IN_TIME_OUT = 14400;
 // ======================================================
 const signInFacebook = async (req, res) => {
   const { user } = req;
-
   const userExist = await User.findOne({ email: user.emails[0].value });
   if (userExist) {
     const jwtoken = jwt.sign({ user: userExist }, process.env.TOKEN_SECRET, {

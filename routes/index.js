@@ -19,7 +19,7 @@ api.post('/signup', authController.signUp);
 api.post('/signin', authController.signIn);
 api.post('/signingoogle', authController.signInGoogle);
 api.post(
-  '/siginfacebook',
+  '/signinfacebook',
   passport.authenticate('facebookToken', { session: false }),
   authController.signInFacebook
 );

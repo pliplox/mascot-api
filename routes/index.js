@@ -1,7 +1,6 @@
+require('../passport');
 const express = require('express');
 const passport = require('passport');
-// eslint-disable-next-line no-unused-vars
-const passportConf = require('../passport');
 const usersController = require('../controllers/usersController');
 const authController = require('../controllers/authController');
 const familyGroupsController = require('../controllers/familyGroupsController');
@@ -25,7 +24,7 @@ api.post(
 );
 
 // Users
-api.get('/getusers', authUser, usersController.getUsers);
+api.get('/getusers', authUser, authRole(ADMIN), usersController.getUsers);
 api.put('/updateuser/:id', authUser, usersController.updateUser);
 api.post('/createuser', authUser, authRole(ADMIN), usersController.createUser);
 api.delete('/deleteuser/:id', authUser, usersController.deleteUser);

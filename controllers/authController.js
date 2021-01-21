@@ -22,7 +22,6 @@ const signInFacebook = async (req, res) => {
       expiresIn: SIGN_IN_TIME_OUT
     }); //  4 hours...
     return res.status(200).send({
-      ok: true,
       message: 'Inicio de sesion con Facebook',
       user: {
         createAt: userExist.createdAt,
@@ -51,7 +50,6 @@ const signInFacebook = async (req, res) => {
     }); //  4 hours...
 
     return res.status(200).send({
-      ok: true,
       message: 'Usuario guardado',
       user: {
         createAt: savedUser.createdAt,
@@ -64,8 +62,7 @@ const signInFacebook = async (req, res) => {
       token: { jwtoken }
     });
   } catch (saveErr) {
-    return res.status(400).json({
-      ok: false,
+    return res.status(400).send({
       message: saveErr
     });
   }
@@ -92,8 +89,7 @@ const verify = async token => {
 const signInGoogle = async (req, res) => {
   const { token } = req.body;
   const googleUser = await verify(token).catch(e => {
-    return res.status(403).json({
-      ok: false,
+    return res.status(403).send({
       message: ` Token no valido: ${e}`
     });
   });
@@ -104,8 +100,7 @@ const signInGoogle = async (req, res) => {
       expiresIn: SIGN_IN_TIME_OUT
     }); // 4 hours...
 
-    return res.status(200).json({
-      ok: true,
+    return res.status(200).send({
       message: 'Inicio de sesion con Google',
       user: {
         createAt: userExist.createdAt,
@@ -132,7 +127,6 @@ const signInGoogle = async (req, res) => {
       expiresIn: SIGN_IN_TIME_OUT
     }); // 4 hours...
     return res.status(200).send({
-      ok: true,
       message: 'Usuario guardado',
       user: {
         createAt: savedUser.createdAt,
@@ -145,8 +139,7 @@ const signInGoogle = async (req, res) => {
       token: { jwtoken }
     });
   } catch (saveErr) {
-    return res.status(400).json({
-      ok: false,
+    return res.status(400).send({
       message: saveErr
     });
   }
@@ -159,7 +152,7 @@ const signUp = async (req, res) => {
   const { error } = registerValidation(req.body);
   if (error) return res.status(400).send({ message: error.details[0].message });
   const emailExist = await User.findOne({ email: req.body.email });
-  if (emailExist) return res.status(400).send({ ok: false, message: 'Email ya existe' });
+  if (emailExist) return res.status(400).send({ message: 'Email ya existe' });
   const user = new User();
   user.name = req.body.name;
   user.email = req.body.email;
@@ -187,8 +180,7 @@ const signIn = async (req, res) => {
   // Verify email
   // ======================================================
   if (!userExist || !bcrypt.compareSync(body.password, userExist.password)) {
-    return res.status(401).json({
-      ok: false,
+    return res.status(401).send({
       message: `Correo electronico o contraseña incorrecta`
     });
   }
@@ -200,7 +192,6 @@ const signIn = async (req, res) => {
     expiresIn: SIGN_IN_TIME_OUT
   });
   return res.status(200).send({
-    ok: true,
     userId: userExist.id,
     name: userExist.name,
     email: userExist.email,

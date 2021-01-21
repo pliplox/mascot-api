@@ -1,4 +1,6 @@
+require('../passport');
 const express = require('express');
+const passport = require('passport');
 const usersController = require('../controllers/usersController');
 const authController = require('../controllers/authController');
 const familyGroupsController = require('../controllers/familyGroupsController');
@@ -15,7 +17,11 @@ const api = express.Router();
 api.post('/signup', authController.signUp);
 api.post('/signin', authController.signIn);
 api.post('/signingoogle', authController.signInGoogle);
-// api.get('/signingithub', authController.signInGitHub); // TODO: StandBy
+api.post(
+  '/signinfacebook',
+  passport.authenticate('facebookToken', { session: false }),
+  authController.signInFacebook
+);
 
 // Users
 api.get('/getusers', authUser, authRole(ADMIN), usersController.getUsers);

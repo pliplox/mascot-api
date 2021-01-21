@@ -111,4 +111,16 @@ describe('Authentication Controller', () => {
       });
     });
   });
+
+  describe('signInGoogle', () => {
+    it('signInGoogle is a function', () => {
+      expect(typeof authController.signInGoogle).toBe('function');
+    });
+  });
+
+  describe('signInFacebook', () => {
+    it('signInFacebook is a function', () => {
+      expect(typeof authController.signInFacebook).toBe('function');
+    });
+  });
 });

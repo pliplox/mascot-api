@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const TimeZone = require('./TimeZone');
 
 const { Schema } = mongoose;
+const userRef = 'User';
 
 const familyGroupSchema = new Schema({
   name: {
@@ -11,7 +12,7 @@ const familyGroupSchema = new Schema({
   users: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'User'
+      ref: userRef
     }
   ],
   timeZone: {
@@ -22,6 +23,12 @@ const familyGroupSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: 'Pet'
+    }
+  ],
+  groupAdmins: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: userRef
     }
   ]
 });

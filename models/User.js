@@ -5,13 +5,15 @@ mongoose.set('useCreateIndex', true);
 
 const { Schema } = mongoose;
 
+const ROLES = { ADMIN: 'ADMIN', BASIC: 'BASIC' };
+
 const validRoleEnum = {
-  values: ['ADMIN_ROLE', 'USER_ROLE'], //  *** If necessary you can add more roles ***
-  message: '{VALUE} it isn´t an allowed role'
+  values: Object.values(ROLES),
+  message: "{VALUE} it isn't an allowed role"
 };
 
 const loginTypeEnum = {
-  values: ['NORMAL', 'GOOGLE'], //  *** If necessary you can add more roles ***
+  values: ['NORMAL', 'GOOGLE', 'FACEBOOK'],
   message: '{VALUE} it isn´t an allowed role'
 };
 
@@ -50,7 +52,7 @@ const userSchema = new Schema({
   role: {
     type: String,
     required: true,
-    default: 'USER_ROLE',
+    default: ROLES.BASIC,
     enum: validRoleEnum
   },
   loginType: {
@@ -77,4 +79,6 @@ userSchema.pre('save', async function encriptPassword(next) {
   }
 });
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+module.exports = { User, ROLES };

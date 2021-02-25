@@ -1,7 +1,7 @@
 const httpMocks = require('node-mocks-http');
 const faker = require('faker');
 const authController = require('../../controllers/authController');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 const databaseHandler = require('../helpers/databaseHandler');
 
 let req;
@@ -109,6 +109,18 @@ describe('Authentication Controller', () => {
         authController.signIn(req, res, next);
         expect(res.statusCode).toBe(200);
       });
+    });
+  });
+
+  describe('signInGoogle', () => {
+    it('signInGoogle is a function', () => {
+      expect(typeof authController.signInGoogle).toBe('function');
+    });
+  });
+
+  describe('signInFacebook', () => {
+    it('signInFacebook is a function', () => {
+      expect(typeof authController.signInFacebook).toBe('function');
     });
   });
 });

@@ -6,7 +6,7 @@ const FamilyGroup = require('../../models/FamilyGroup');
 const Fed = require('../../models/Fed');
 const Pet = require('../../models/Pet');
 const TimeZone = require('../../models/TimeZone');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 
 // controllers
 const { signIn, signUp } = require('../../controllers/authController');

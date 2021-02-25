@@ -4,13 +4,21 @@ const petsController = require('../../controllers/petsController');
 const authController = require('../../controllers/authController');
 const TimeZone = require('../../models/TimeZone');
 const FamilyGroup = require('../../models/FamilyGroup');
-const User = require('../../models/User');
+const { User } = require('../../models/User');
 const Pet = require('../../models/Pet');
 require('../../models/Fed'); // to be called when getAllPets is called
 
 const databaseHandler = require('../helpers/databaseHandler');
+// const { async } = require('regenerator-runtime');
 
-const { createPet, getPet, getAllPets, updatePet, destroyPet } = petsController;
+const {
+  createPet,
+  getPet,
+  getAllPetsByGroupId,
+  updatePet,
+  destroyPet,
+  getAllPetsByUser
+} = petsController;
 
 let req;
 let res;
@@ -108,13 +116,13 @@ describe('Pets Controller', () => {
       await getPet(req, res, next);
       const responseData = res._getData();
       const { message, pet: responsePet } = responseData;
-      expect(message).toBe('Mascota encontrado con éxito');
+      expect(message).toBe('Mascota encontrada con éxito');
       expect(responsePet.id).toBe(savedPet._id.toString());
       expect(responsePet).toBeInstanceOf(Pet);
     });
   });
 
-  describe('getAllPets', () => {
+  describe('getAllPetsByGroupId', () => {
     let savedAnotherPet;
     let familyGroupWithPets;
     beforeEach(async () => {
@@ -141,7 +149,7 @@ describe('Pets Controller', () => {
 
     // TODO: re-do this test with better mocks
     it.skip('returns all pets from a family group', async () => {
-      await getAllPets(req, res, next);
+      await getAllPetsByGroupId(req, res, next);
       expect(res.statusCode).toBe(200);
       expect(res._getData().pets.length).toBe(2);
     });
@@ -190,6 +198,79 @@ describe('Pets Controller', () => {
       expect(res.statusCode).toBe(200);
       expect(res._getData().message).toBe('Mascota eliminada con éxito');
       expect(res._getData().pet._id).toStrictEqual(petToDestroy._id);
+    });
+  });
+
+  describe('getAllPetsByUser', () => {
+    let petInFirstGroup;
+    let petInSecondGroup;
+    let petInThirdGroup;
+
+    let currentUser;
+
+    beforeEach(async () => {
+      try {
+        const secondGroup = new FamilyGroup({ name: faker.name.lastName() });
+        const thirdGroup = new FamilyGroup({ name: faker.name.lastName() });
+
+        const { internet } = faker;
+        currentUser = await User.create({
+          name: internet.userName(),
+          password: internet.password(6),
+          email: internet.email()
+        });
+
+        // Assign current user to family groups
+        savedFamilyGroup.users.push(currentUser);
+        secondGroup.users.push(currentUser);
+        thirdGroup.users.push(currentUser);
+
+        await savedFamilyGroup.save();
+        await secondGroup.save();
+        await thirdGroup.save();
+
+        // Assign different pets to each family group
+        petInFirstGroup = await Pet.create({
+          name: faker.name.firstName(),
+          familyGroup: savedFamilyGroup
+        });
+
+        petInSecondGroup = await Pet.create({
+          name: faker.name.firstName(),
+          familyGroup: secondGroup
+        });
+
+        petInThirdGroup = await Pet.create({
+          name: faker.name.firstName(),
+          familyGroup: thirdGroup
+        });
+
+        savedFamilyGroup.pets.push(petInFirstGroup);
+        secondGroup.pets.push(petInSecondGroup);
+        thirdGroup.pets.push(petInThirdGroup);
+
+        await savedFamilyGroup.save();
+        await secondGroup.save();
+        await thirdGroup.save();
+
+        currentUser.familyGroups.push(savedFamilyGroup, secondGroup, thirdGroup);
+        await currentUser.save();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    });
+
+    it('returns a list with all pets from the current user', async () => {
+      req.userId = currentUser.id;
+      await getAllPetsByUser(req, res, next);
+
+      const responseData = res._getData();
+      const responsePetNames = responseData.pets.map(({ name }) => name);
+
+      [petInFirstGroup, petInSecondGroup, petInThirdGroup].forEach(({ name }) => {
+        expect(responsePetNames.includes(name)).toBe(true);
+      });
     });
   });
 });

@@ -1,6 +1,7 @@
 const Pet = require('../models/Pet');
 const FamilyGroup = require('../models/FamilyGroup');
 const { findUserInFamilyGroup } = require('../utils/sharedFunctions');
+const { User } = require('../models/User');
 
 const createPet = async (req, res) => {
   const {
@@ -34,13 +35,13 @@ const getPet = async (req, res) => {
   try {
     const pet = await Pet.findById(petId);
     if (!pet) return res.status(404).send({ message: 'Mascota no excontrada' });
-    return res.status(200).send({ message: 'Mascota encontrado con éxito', pet });
+    return res.status(200).send({ message: 'Mascota encontrada con éxito', pet });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
 };
 
-const getAllPets = async (req, res) => {
+const getAllPetsByGroupId = async (req, res) => {
   const {
     userId,
     params: { familyGroupId }
@@ -110,10 +111,27 @@ const destroyPet = async (req, res) => {
   }
 };
 
+const getAllPetsByUser = async (req, res) => {
+  const { userId } = req;
+  try {
+    const user = await User.findById(userId).populate({
+      path: 'familyGroups',
+      populate: { path: 'pets' }
+    });
+
+    const petList = user.familyGroups.map(group => group.pets).flat();
+
+    return res.status(200).send({ pets: petList, message: 'Mascotas encontradas con éxito' });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 module.exports = {
   createPet,
   getPet,
-  getAllPets,
+  getAllPetsByGroupId,
   updatePet,
-  destroyPet
+  destroyPet,
+  getAllPetsByUser
 };

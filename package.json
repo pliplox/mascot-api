@@ -1,17 +1,20 @@
 {
   "name": "pliplox",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0-alpha-beta",
   "description": "Main back-end for the pliplox project",
   "main": "index.js",
+  "engines": {
+    "node": "15.x"
+  },
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch --runInBand",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
     "test:debug:windows": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
-    "server:local": "cross-env API_ENV=local nodemon index.js",
-    "server:staging": "cross-env API_ENV=staging nodemon index.js",
-    "server:production": "cross-env API_ENV=production nodemon index.js",
+    "server:local": "cross-env API_ENV=local nodemon --exec babel-node index.js",
+    "server:staging": "cross-env API_ENV=staging nodemon --exec babel-node index.js",
+    "server:production": "cross-env API_ENV=production --exec babel-node nodemon index.js",
     "repl:local": "cross-env API_ENV=local NODE_OPTIONS=--experimental-repl-await node repl.js",
     "repl:staging": "cross-env API_ENV=staging NODE_OPTIONS=--experimental-repl-await node repl.js",
     "repl:production": "cross-env API_ENV=production NODE_OPTIONS=--experimental-repl-await node repl.js",
@@ -31,7 +34,6 @@
     "@hapi/joi": "^16.1.7",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
-    "circular-json": "^0.5.9",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "faker": "^4.1.0",
@@ -40,9 +42,16 @@
     "luxon": "^1.21.3",
     "mongodb-memory-server": "^6.6.3",
     "mongoose": "^5.7.4",
-    "superagent": "^5.1.0"
+    "passport": "^0.4.1",
+    "passport-facebook-token": "^4.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/plugin-proposal-optional-chaining": "^7.12.7",
+    "@babel/preset-env": "^7.12.11",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^26.6.3",
     "cross-env": "^7.0.2",
     "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -52,6 +61,7 @@
     "jest": "^26.6.3",
     "node-mocks-http": "^1.8.0",
     "nodemon": "^2.0.4",
-    "prettier": "1.18.2"
+    "prettier": "1.18.2",
+    "regenerator-runtime": "^0.13.7"
   }
 }

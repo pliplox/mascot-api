@@ -21,7 +21,8 @@ const {
   getFamilyGroup,
   createFamilyGroup,
   updateFamilyGroup,
-  destroyFamilyGroup
+  destroyFamilyGroup,
+  removeMember
 } = familyGroupsController;
 
 let req;
@@ -46,6 +47,13 @@ describe('Family Group Controller', () => {
   let savedFamilyGroup;
   let savedUser;
   let user;
+
+  const adminUserData = {
+    name: 'adminUser',
+    email: 'admin@mail.cl',
+    password: '123123',
+    role: 'ADMIN'
+  };
 
   // TODO: change this to ensure a different instance in every described test request
   beforeEach(async () => {
@@ -184,12 +192,7 @@ describe('Family Group Controller', () => {
 
     describe('When admin role destroys family group', () => {
       it('returns a successful destroyed message', async () => {
-        const adminUser = new User({
-          name: 'adminUser',
-          email: 'admin@mail.cl',
-          password: '123123',
-          role: 'ADMIN'
-        });
+        const adminUser = new User(adminUserData);
         savedFamilyGroup.users.push(adminUser);
         adminUser.familyGroups.push(savedFamilyGroup);
 
@@ -219,6 +222,20 @@ describe('Family Group Controller', () => {
         expect(res.statusCode).toBe(401);
         expect(res._getData().message).toBe('No estás autorizado para realizar esta acción');
       });
+    });
+  });
+
+  describe('removeMember', () => {
+    describe('when an admin user removes a member', () => {
+      it('removes the member', async () => {});
+    });
+
+    describe('when a group admin removes a member', () => {
+      it('removes the member', () => {});
+    });
+
+    describe('when user removes itself from the group', () => {
+      it('removes itself', () => {});
     });
   });
 });

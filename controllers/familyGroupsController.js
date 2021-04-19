@@ -3,6 +3,9 @@ const { User, ROLES } = require('../models/User');
 const TimeZone = require('../models/TimeZone');
 const { findUserInFamilyGroup } = require('../utils/sharedFunctions');
 
+const GROUP_NOT_FOUND = 'Grupo familiar no encontrado';
+const UNAUTHORIZED_ACTION_MESSAGE = 'No estás autorizado para realizar esta acción';
+
 const getFamilyGroups = async (req, res) => {
   const { userId } = req;
   try {
@@ -144,7 +147,6 @@ const updateFamilyGroup = async (req, res) => {
 };
 
 const destroyFamilyGroup = async (req, res) => {
-  const unauthorizedActionMessage = 'No estás autorizado para realizar esta acción';
   const {
     params: { groupId },
     userId
@@ -153,12 +155,12 @@ const destroyFamilyGroup = async (req, res) => {
   try {
     const familyGroup = await FamilyGroup.findById(groupId);
     if (!familyGroup) {
-      return res.status(404).send({ message: 'Grupo familiar no encontrado' });
+      return res.status(404).send({ message: GROUP_NOT_FOUND });
     }
 
     const findUser = findUserInFamilyGroup(familyGroup, userId);
     if (!findUser) {
-      return res.status(401).send({ message: unauthorizedActionMessage });
+      return res.status(401).send({ message: UNAUTHORIZED_ACTION_MESSAGE });
     }
 
     const currentUser = await User.findById(userId);
@@ -180,7 +182,53 @@ const destroyFamilyGroup = async (req, res) => {
       await FamilyGroup.deleteOne(familyGroup);
       return res.status(200).send({ message: 'Grupo familiar eliminado con éxito' });
     }
-    return res.status(401).send({ message: unauthorizedActionMessage });
+    return res.status(401).send({ message: UNAUTHORIZED_ACTION_MESSAGE });
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
+
+const removeMember = async (req, res) => {
+  const {
+    params: { groupId, userId },
+    userId: currentUserId
+  } = req;
+
+  try {
+    const group = await FamilyGroup.findById(groupId);
+    if (!group) {
+      return res.status(404).send({ message: GROUP_NOT_FOUND });
+    }
+
+    const currentUser = await User.findById(currentUserId);
+
+    // check if current user is group admin
+    const groupAdmin = group.groupAdmins.find(admin => admin.toString() === currentUserId);
+
+    if (groupAdmin || currentUser?.role === ROLES.ADMIN || userId === currentUserId) {
+      const userToRemove = await User.findById(userId);
+
+      // filter user from group
+      const filteredUsers = group.users.filter(
+        userIdInGroup => userIdInGroup.toString() !== userId
+      );
+
+      // filter group from user
+      const filteredGroups = userToRemove.familyGroups.filter(
+        familyGroupId => familyGroupId.toString() !== groupId
+      );
+
+      // save changes
+      group.users = filteredUsers;
+      await group.save();
+
+      userToRemove.familyGroups = filteredGroups;
+      await userToRemove.save();
+
+      return res.status(200).send({ message: 'Usuario quitado con éxito' });
+    }
+
+    return res.status(401).send({ message: UNAUTHORIZED_ACTION_MESSAGE });
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -191,5 +239,6 @@ module.exports = {
   getFamilyGroups,
   getFamilyGroup,
   updateFamilyGroup,
-  destroyFamilyGroup
+  destroyFamilyGroup,
+  removeMember
 };
